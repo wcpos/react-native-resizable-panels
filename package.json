@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "name": "react-native-resizable-panels-repo",
+  "scripts": {
+    "dev": "turbo dev --filter=\"{./packages/*}...\"",
+    "dev:example": "turbo dev --filter=\"{./apps/example}...\"",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "build": "turbo build",
+    "build:example": "turbo build --filter=\"...{./apps/example}\""
+  },
+  "devDependencies": {
+    "turbo": "^1.13.4",
+    "typescript": "^5.8.3"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 2,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  }
+}

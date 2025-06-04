@@ -1,0 +1,1060 @@
+'use client'
+
+// src/Panel.tsx
+import { useContext, useImperativeHandle, useLayoutEffect, useRef as useRef2 } from "react";
+import { View } from "react-native";
+
+// src/hooks/useUniqueId.ts
+import * as React from "react";
+import { useRef } from "react";
+var useId = React["useId".toString()];
+var wrappedUseId = typeof useId === "function" ? useId : () => null;
+var counter = 0;
+function useUniqueId(idFromParams = null) {
+  const idFromUseId = wrappedUseId();
+  const idRef = useRef(idFromParams || idFromUseId || null);
+  if (idRef.current === null) {
+    idRef.current = "" + counter++;
+  }
+  return idFromParams ?? idRef.current;
+}
+
+// src/PanelGroupContext.ts
+import { createContext } from "react";
+var PanelGroupContext = createContext(null);
+PanelGroupContext.displayName = "PanelGroupContext";
+
+// src/Panel.tsx
+function Panel({
+  children,
+  collapsedSize,
+  collapsible,
+  defaultSize,
+  id: idFromProps,
+  maxSize,
+  minSize,
+  onCollapse,
+  onExpand,
+  onResize,
+  order,
+  style: styleFromProps,
+  panelRef,
+  ...viewProps
+}) {
+  const context = useContext(PanelGroupContext);
+  if (context === null) {
+    throw new Error(`<Panel> must be rendered inside a <PanelGroup>`);
+  }
+  const {
+    collapsePanel,
+    expandPanel,
+    getPanelSize,
+    getPanelStyle,
+    isPanelCollapsed,
+    reevaluatePanelConstraints,
+    registerPanel,
+    resizePanel: resizePanel2,
+    unregisterPanel
+  } = context;
+  const panelId = useUniqueId(idFromProps);
+  const panelDataRef = useRef2({
+    callbacks: {
+      onCollapse,
+      onExpand,
+      onResize
+    },
+    constraints: {
+      collapsedSize,
+      collapsible,
+      defaultSize,
+      maxSize,
+      minSize
+    },
+    id: panelId,
+    idIsFromProps: idFromProps !== void 0,
+    order
+  });
+  useLayoutEffect(() => {
+    const { callbacks, constraints } = panelDataRef.current;
+    const prevConstraints = { ...constraints };
+    panelDataRef.current.id = panelId;
+    panelDataRef.current.idIsFromProps = idFromProps !== void 0;
+    panelDataRef.current.order = order;
+    callbacks.onCollapse = onCollapse;
+    callbacks.onExpand = onExpand;
+    callbacks.onResize = onResize;
+    constraints.collapsedSize = collapsedSize;
+    constraints.collapsible = collapsible;
+    constraints.defaultSize = defaultSize;
+    constraints.maxSize = maxSize;
+    constraints.minSize = minSize;
+    if (prevConstraints.collapsedSize !== constraints.collapsedSize || prevConstraints.collapsible !== constraints.collapsible || prevConstraints.maxSize !== constraints.maxSize || prevConstraints.minSize !== constraints.minSize) {
+      reevaluatePanelConstraints(panelDataRef.current, prevConstraints);
+    }
+  });
+  useLayoutEffect(() => {
+    const panelData = panelDataRef.current;
+    registerPanel(panelData);
+    return () => {
+      unregisterPanel(panelData);
+    };
+  }, [order, panelId, registerPanel, unregisterPanel]);
+  useImperativeHandle(
+    panelRef,
+    () => ({
+      collapse: () => {
+        collapsePanel(panelDataRef.current);
+      },
+      expand: (minSize2) => {
+        expandPanel(panelDataRef.current, minSize2);
+      },
+      getId() {
+        return panelId;
+      },
+      getSize() {
+        return getPanelSize(panelDataRef.current);
+      },
+      isCollapsed() {
+        return isPanelCollapsed(panelDataRef.current);
+      },
+      isExpanded() {
+        return !isPanelCollapsed(panelDataRef.current);
+      },
+      resize: (size) => {
+        resizePanel2(panelDataRef.current, size);
+      }
+    }),
+    [collapsePanel, expandPanel, getPanelSize, isPanelCollapsed, panelId, resizePanel2]
+  );
+  const panelStyle = getPanelStyle(panelDataRef.current, defaultSize);
+  return <View {...viewProps} style={[panelStyle, styleFromProps]}>
+      {children}
+    </View>;
+}
+
+// src/PanelGroup.tsx
+import {
+  useCallback,
+  useImperativeHandle as useImperativeHandle2,
+  useLayoutEffect as useLayoutEffect2,
+  useMemo,
+  useRef as useRef3,
+  useState
+} from "react";
+import { View as View2 } from "react-native";
+import { runOnJS } from "react-native-reanimated";
+
+// src/utils/assert.ts
+function assert(expectedCondition, message) {
+  if (!expectedCondition) {
+    console.error(message);
+    throw Error(message);
+  }
+}
+
+// src/constants.ts
+var DATA_ATTRIBUTES = {
+  group: "data-panel-group",
+  groupDirection: "data-panel-group-direction",
+  groupId: "data-panel-group-id",
+  panel: "data-panel",
+  panelCollapsible: "data-panel-collapsible",
+  panelId: "data-panel-id",
+  panelSize: "data-panel-size",
+  resizeHandle: "data-resize-handle",
+  resizeHandleActive: "data-resize-handle-active",
+  resizeHandleEnabled: "data-panel-resize-handle-enabled",
+  resizeHandleId: "data-panel-resize-handle-id",
+  resizeHandleState: "data-resize-handle-state"
+};
+var PRECISION = 10;
+
+// src/utils/numbers/fuzzyCompareNumbers.ts
+function fuzzyCompareNumbers(actual, expected, fractionDigits = PRECISION) {
+  if (actual.toFixed(fractionDigits) === expected.toFixed(fractionDigits)) {
+    return 0;
+  } else {
+    return actual > expected ? 1 : -1;
+  }
+}
+function fuzzyNumbersEqual(actual, expected, fractionDigits = PRECISION) {
+  return fuzzyCompareNumbers(actual, expected, fractionDigits) === 0;
+}
+
+// src/utils/numbers/fuzzyNumbersEqual.ts
+function fuzzyNumbersEqual2(actual, expected, fractionDigits) {
+  return fuzzyCompareNumbers(actual, expected, fractionDigits) === 0;
+}
+
+// src/utils/numbers/fuzzyLayoutsEqual.ts
+function fuzzyLayoutsEqual(actual, expected, fractionDigits) {
+  if (actual.length !== expected.length) {
+    return false;
+  }
+  for (let index = 0; index < actual.length; index++) {
+    const actualSize = actual[index];
+    const expectedSize = expected[index];
+    if (!fuzzyNumbersEqual2(actualSize, expectedSize, fractionDigits)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// src/utils/resizePanel.ts
+function resizePanel({
+  panelConstraints: panelConstraintsArray,
+  panelIndex,
+  size
+}) {
+  const panelConstraints = panelConstraintsArray[panelIndex];
+  assert(
+    panelConstraints != null,
+    `Panel constraints not found for index ${panelIndex}`
+  );
+  let {
+    collapsedSize = 0,
+    collapsible,
+    maxSize = 100,
+    minSize = 0
+  } = panelConstraints;
+  if (fuzzyCompareNumbers(size, minSize) < 0) {
+    if (collapsible) {
+      const halfwayPoint = (collapsedSize + minSize) / 2;
+      if (fuzzyCompareNumbers(size, halfwayPoint) < 0) {
+        size = collapsedSize;
+      } else {
+        size = minSize;
+      }
+    } else {
+      size = minSize;
+    }
+  }
+  size = Math.min(maxSize, size);
+  size = parseFloat(size.toFixed(PRECISION));
+  return size;
+}
+
+// src/utils/adjustLayoutByDelta.ts
+function adjustLayoutByDelta({
+  delta,
+  initialLayout,
+  panelConstraints: panelConstraintsArray,
+  pivotIndices,
+  prevLayout,
+  trigger
+}) {
+  if (fuzzyNumbersEqual2(delta, 0)) {
+    return initialLayout;
+  }
+  const nextLayout = [...initialLayout];
+  const [firstPivotIndex, secondPivotIndex] = pivotIndices;
+  assert(firstPivotIndex != null, "Invalid first pivot index");
+  assert(secondPivotIndex != null, "Invalid second pivot index");
+  let deltaApplied = 0;
+  {
+    if (trigger === "keyboard") {
+      {
+        const index = delta < 0 ? secondPivotIndex : firstPivotIndex;
+        const panelConstraints = panelConstraintsArray[index];
+        assert(panelConstraints, `Panel constraints not found for index ${index}`);
+        const { collapsedSize = 0, collapsible, minSize = 0 } = panelConstraints;
+        if (collapsible) {
+          const prevSize = initialLayout[index];
+          assert(prevSize != null, `Previous layout not found for panel index ${index}`);
+          if (fuzzyNumbersEqual2(prevSize, collapsedSize)) {
+            const localDelta = minSize - prevSize;
+            if (fuzzyCompareNumbers(localDelta, Math.abs(delta)) > 0) {
+              delta = delta < 0 ? 0 - localDelta : localDelta;
+            }
+          }
+        }
+      }
+      {
+        const index = delta < 0 ? firstPivotIndex : secondPivotIndex;
+        const panelConstraints = panelConstraintsArray[index];
+        assert(panelConstraints, `No panel constraints found for index ${index}`);
+        const { collapsedSize = 0, collapsible, minSize = 0 } = panelConstraints;
+        if (collapsible) {
+          const prevSize = initialLayout[index];
+          assert(prevSize != null, `Previous layout not found for panel index ${index}`);
+          if (fuzzyNumbersEqual2(prevSize, minSize)) {
+            const localDelta = prevSize - collapsedSize;
+            if (fuzzyCompareNumbers(localDelta, Math.abs(delta)) > 0) {
+              delta = delta < 0 ? 0 - localDelta : localDelta;
+            }
+          }
+        }
+      }
+    }
+  }
+  {
+    const increment = delta < 0 ? 1 : -1;
+    let index = delta < 0 ? secondPivotIndex : firstPivotIndex;
+    let maxAvailableDelta = 0;
+    while (true) {
+      const prevSize = initialLayout[index];
+      assert(prevSize != null, `Previous layout not found for panel index ${index}`);
+      const maxSafeSize = resizePanel({
+        panelConstraints: panelConstraintsArray,
+        panelIndex: index,
+        size: 100
+      });
+      const delta2 = maxSafeSize - prevSize;
+      maxAvailableDelta += delta2;
+      index += increment;
+      if (index < 0 || index >= panelConstraintsArray.length) {
+        break;
+      }
+    }
+    const minAbsDelta = Math.min(Math.abs(delta), Math.abs(maxAvailableDelta));
+    delta = delta < 0 ? 0 - minAbsDelta : minAbsDelta;
+  }
+  {
+    const pivotIndex = delta < 0 ? firstPivotIndex : secondPivotIndex;
+    let index = pivotIndex;
+    while (index >= 0 && index < panelConstraintsArray.length) {
+      const deltaRemaining = Math.abs(delta) - Math.abs(deltaApplied);
+      const prevSize = initialLayout[index];
+      assert(prevSize != null, `Previous layout not found for panel index ${index}`);
+      const unsafeSize = prevSize - deltaRemaining;
+      const safeSize = resizePanel({
+        panelConstraints: panelConstraintsArray,
+        panelIndex: index,
+        size: unsafeSize
+      });
+      if (!fuzzyNumbersEqual2(prevSize, safeSize)) {
+        deltaApplied += prevSize - safeSize;
+        nextLayout[index] = safeSize;
+        if (deltaApplied.toPrecision(3).localeCompare(Math.abs(delta).toPrecision(3), void 0, {
+          numeric: true
+        }) >= 0) {
+          break;
+        }
+      }
+      if (delta < 0) {
+        index--;
+      } else {
+        index++;
+      }
+    }
+  }
+  if (fuzzyLayoutsEqual(prevLayout, nextLayout)) {
+    return prevLayout;
+  }
+  {
+    const pivotIndex = delta < 0 ? secondPivotIndex : firstPivotIndex;
+    const prevSize = initialLayout[pivotIndex];
+    assert(prevSize != null, `Previous layout not found for panel index ${pivotIndex}`);
+    const unsafeSize = prevSize + deltaApplied;
+    const safeSize = resizePanel({
+      panelConstraints: panelConstraintsArray,
+      panelIndex: pivotIndex,
+      size: unsafeSize
+    });
+    nextLayout[pivotIndex] = safeSize;
+    if (!fuzzyNumbersEqual2(safeSize, unsafeSize)) {
+      let deltaRemaining = unsafeSize - safeSize;
+      const pivotIndex2 = delta < 0 ? secondPivotIndex : firstPivotIndex;
+      let index = pivotIndex2;
+      while (index >= 0 && index < panelConstraintsArray.length) {
+        const prevSize2 = nextLayout[index];
+        assert(prevSize2 != null, `Previous layout not found for panel index ${index}`);
+        const unsafeSize2 = prevSize2 + deltaRemaining;
+        const safeSize2 = resizePanel({
+          panelConstraints: panelConstraintsArray,
+          panelIndex: index,
+          size: unsafeSize2
+        });
+        if (!fuzzyNumbersEqual2(prevSize2, safeSize2)) {
+          deltaRemaining -= safeSize2 - prevSize2;
+          nextLayout[index] = safeSize2;
+        }
+        if (fuzzyNumbersEqual2(deltaRemaining, 0)) {
+          break;
+        }
+        if (delta > 0) {
+          index--;
+        } else {
+          index++;
+        }
+      }
+    }
+  }
+  const totalSize = nextLayout.reduce((total, size) => size + total, 0);
+  if (!fuzzyNumbersEqual2(totalSize, 100)) {
+    return prevLayout;
+  }
+  return nextLayout;
+}
+
+// src/utils/arrays.ts
+function areEqual(arrayA, arrayB) {
+  if (arrayA.length !== arrayB.length) {
+    return false;
+  }
+  for (let index = 0; index < arrayA.length; index++) {
+    if (arrayA[index] !== arrayB[index]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// src/utils/calculateUnsafeDefaultLayout.ts
+function calculateUnsafeDefaultLayout({
+  panelDataArray
+}) {
+  const layout = Array(panelDataArray.length);
+  const panelConstraintsArray = panelDataArray.map(
+    (panelData) => panelData.constraints
+  );
+  let numPanelsWithSizes = 0;
+  let remainingSize = 100;
+  for (let index = 0; index < panelDataArray.length; index++) {
+    const panelConstraints = panelConstraintsArray[index];
+    assert(panelConstraints, `Panel constraints not found for index ${index}`);
+    const { defaultSize } = panelConstraints;
+    if (defaultSize != null) {
+      numPanelsWithSizes++;
+      layout[index] = defaultSize;
+      remainingSize -= defaultSize;
+    }
+  }
+  for (let index = 0; index < panelDataArray.length; index++) {
+    const panelConstraints = panelConstraintsArray[index];
+    assert(panelConstraints, `Panel constraints not found for index ${index}`);
+    const { defaultSize } = panelConstraints;
+    if (defaultSize != null) {
+      continue;
+    }
+    const numRemainingPanels = panelDataArray.length - numPanelsWithSizes;
+    const size = remainingSize / numRemainingPanels;
+    numPanelsWithSizes++;
+    layout[index] = size;
+    remainingSize -= size;
+  }
+  return layout;
+}
+
+// src/utils/callPanelCallbacks.ts
+function callPanelCallbacks(panelsArray, layout, panelIdToLastNotifiedSizeMap) {
+  layout.forEach((size, index) => {
+    const panelData = panelsArray[index];
+    assert(panelData, `Panel data not found for index ${index}`);
+    const { callbacks, constraints, id: panelId } = panelData;
+    const { collapsedSize = 0, collapsible } = constraints;
+    const lastNotifiedSize = panelIdToLastNotifiedSizeMap[panelId];
+    if (lastNotifiedSize == null || size !== lastNotifiedSize) {
+      panelIdToLastNotifiedSizeMap[panelId] = size;
+      const { onCollapse, onExpand, onResize } = callbacks;
+      if (onResize) {
+        onResize(size, lastNotifiedSize);
+      }
+      if (collapsible && (onCollapse || onExpand)) {
+        if (onExpand && (lastNotifiedSize == null || fuzzyNumbersEqual(lastNotifiedSize, collapsedSize)) && !fuzzyNumbersEqual(size, collapsedSize)) {
+          onExpand();
+        }
+        if (onCollapse && (lastNotifiedSize == null || !fuzzyNumbersEqual(lastNotifiedSize, collapsedSize)) && fuzzyNumbersEqual(size, collapsedSize)) {
+          onCollapse();
+        }
+      }
+    }
+  });
+}
+
+// src/utils/compareLayouts.ts
+function compareLayouts(a, b) {
+  if (a.length !== b.length) {
+    return false;
+  } else {
+    for (let index = 0; index < a.length; index++) {
+      if (a[index] != b[index]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// src/utils/validatePanelGroupLayout.ts
+function validatePanelGroupLayout({
+  layout: prevLayout,
+  panelConstraints
+}) {
+  const nextLayout = [...prevLayout];
+  const nextLayoutTotalSize = nextLayout.reduce((accumulated, current) => accumulated + current, 0);
+  if (nextLayout.length !== panelConstraints.length) {
+    throw Error(
+      `Invalid ${panelConstraints.length} panel layout: ${nextLayout.map((size) => `${size}%`).join(", ")}`
+    );
+  } else if (!fuzzyNumbersEqual2(nextLayoutTotalSize, 100) && nextLayout.length > 0) {
+    if (__DEV__) {
+      console.warn(
+        `WARNING: Invalid layout total size: ${nextLayout.map((size) => `${size}%`).join(", ")}. Layout normalization will be applied.`
+      );
+    }
+    for (let index = 0; index < panelConstraints.length; index++) {
+      const unsafeSize = nextLayout[index];
+      assert(unsafeSize != null, `No layout data found for index ${index}`);
+      const safeSize = 100 / nextLayoutTotalSize * unsafeSize;
+      nextLayout[index] = safeSize;
+    }
+  }
+  let remainingSize = 0;
+  for (let index = 0; index < panelConstraints.length; index++) {
+    const unsafeSize = nextLayout[index];
+    assert(unsafeSize != null, `No layout data found for index ${index}`);
+    const safeSize = resizePanel({
+      panelConstraints,
+      panelIndex: index,
+      size: unsafeSize
+    });
+    if (unsafeSize != safeSize) {
+      remainingSize += unsafeSize - safeSize;
+      nextLayout[index] = safeSize;
+    }
+  }
+  if (!fuzzyNumbersEqual2(remainingSize, 0)) {
+    for (let index = 0; index < panelConstraints.length; index++) {
+      const prevSize = nextLayout[index];
+      assert(prevSize != null, `No layout data found for index ${index}`);
+      const unsafeSize = prevSize + remainingSize;
+      const safeSize = resizePanel({
+        panelConstraints,
+        panelIndex: index,
+        size: unsafeSize
+      });
+      if (prevSize !== safeSize) {
+        remainingSize -= safeSize - prevSize;
+        nextLayout[index] = safeSize;
+        if (fuzzyNumbersEqual2(remainingSize, 0)) {
+          break;
+        }
+      }
+    }
+  }
+  return nextLayout;
+}
+
+// src/PanelGroup.tsx
+function PanelGroup({
+  autoSaveId = null,
+  children,
+  direction,
+  onLayout = () => {
+  },
+  style,
+  ...viewProps
+}, forwardedRef) {
+  const groupId = useRef3(`panel-group-${Math.random().toString(36).slice(2)}`).current;
+  const panelGroupRef = useRef3(null);
+  const [dragState, setDragState] = useState(null);
+  const [layout, setLayout] = useState([]);
+  const panelIdToLastNotifiedSizeMapRef = useRef3({});
+  const panelSizeBeforeCollapseRef = useRef3(/* @__PURE__ */ new Map());
+  const prevDeltaRef = useRef3(0);
+  const committedValuesRef = useRef3({
+    autoSaveId,
+    direction,
+    dragState,
+    onLayout
+  });
+  const eagerValuesRef = useRef3({
+    layout,
+    panelDataArray: [],
+    panelDataArrayChanged: false
+  });
+  useImperativeHandle2(
+    forwardedRef,
+    () => ({
+      getId: () => groupId,
+      getLayout: () => eagerValuesRef.current.layout,
+      setLayout: (unsafeLayout) => {
+        const { onLayout: onLayout2 } = committedValuesRef.current;
+        const { layout: prevLayout, panelDataArray } = eagerValuesRef.current;
+        const safeLayout = validatePanelGroupLayout({
+          layout: unsafeLayout,
+          panelConstraints: panelDataArray.map((pd) => pd.constraints)
+        });
+        if (!areEqual(prevLayout, safeLayout)) {
+          setLayout(safeLayout);
+          eagerValuesRef.current.layout = safeLayout;
+          if (onLayout2) onLayout2(safeLayout);
+          callPanelCallbacks(panelDataArray, safeLayout, panelIdToLastNotifiedSizeMapRef.current);
+        }
+      }
+    }),
+    []
+  );
+  useLayoutEffect2(() => {
+    committedValuesRef.current = {
+      autoSaveId,
+      direction,
+      dragState,
+      onLayout
+    };
+  }, [autoSaveId, direction, dragState, onLayout]);
+  useLayoutEffect2(() => {
+    if (eagerValuesRef.current.panelDataArrayChanged) {
+      eagerValuesRef.current.panelDataArrayChanged = false;
+      const { onLayout: onLayout2 } = committedValuesRef.current;
+      const { panelDataArray, layout: prevLayout } = eagerValuesRef.current;
+      const unsafeLayout = calculateUnsafeDefaultLayout({ panelDataArray });
+      const nextLayout = validatePanelGroupLayout({
+        layout: unsafeLayout,
+        panelConstraints: panelDataArray.map((pd) => pd.constraints)
+      });
+      if (!areEqual(prevLayout, nextLayout)) {
+        setLayout(nextLayout);
+        eagerValuesRef.current.layout = nextLayout;
+        if (onLayout2) onLayout2(nextLayout);
+        callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
+      }
+    }
+  }, []);
+  const registerPanel = useCallback((panelData) => {
+    const arr = eagerValuesRef.current.panelDataArray;
+    arr.push(panelData);
+    arr.sort((a, b) => {
+      const oa = a.order, ob = b.order;
+      if (oa == null && ob == null) return 0;
+      if (oa == null) return -1;
+      if (ob == null) return 1;
+      return oa - ob;
+    });
+    eagerValuesRef.current.panelDataArrayChanged = true;
+  }, []);
+  const unregisterPanel = useCallback((panelData) => {
+    const arr = eagerValuesRef.current.panelDataArray;
+    const idx = arr.findIndex((pd) => pd === panelData || pd.id === panelData.id);
+    if (idx >= 0) {
+      arr.splice(idx, 1);
+      delete panelIdToLastNotifiedSizeMapRef.current[panelData.id];
+      eagerValuesRef.current.panelDataArrayChanged = true;
+    }
+  }, []);
+  const collapsePanel = useCallback((panelData) => {
+    const { onLayout: onLayout2 } = committedValuesRef.current;
+    const { layout: prevLayout, panelDataArray } = eagerValuesRef.current;
+    if (panelData.constraints.collapsible) {
+      const constraintsArr = panelDataArray.map((pd) => pd.constraints);
+      const {
+        collapsedSize = 0,
+        panelSize,
+        pivotIndices
+      } = panelDataHelper(panelDataArray, panelData, prevLayout);
+      if (panelSize == null) {
+        throw new Error(`Panel size not found for ${panelData.id}`);
+      }
+      if (panelSize !== collapsedSize) {
+        panelSizeBeforeCollapseRef.current.set(panelData.id, panelSize);
+        const isLast = findPanelDataIndex(panelDataArray, panelData) === panelDataArray.length - 1;
+        const delta = isLast ? panelSize - collapsedSize : collapsedSize - panelSize;
+        const nextLayout = adjustLayoutByDelta({
+          delta,
+          initialLayout: prevLayout,
+          panelConstraints: constraintsArr,
+          pivotIndices,
+          prevLayout,
+          trigger: "imperative-api"
+        });
+        if (!compareLayouts(prevLayout, nextLayout)) {
+          setLayout(nextLayout);
+          eagerValuesRef.current.layout = nextLayout;
+          if (onLayout2) onLayout2(nextLayout);
+          callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
+        }
+      }
+    }
+  }, []);
+  const expandPanel = useCallback((panelData, minSizeOverride) => {
+    const { onLayout: onLayout2 } = committedValuesRef.current;
+    const { layout: prevLayout, panelDataArray } = eagerValuesRef.current;
+    if (panelData.constraints.collapsible) {
+      const constraintsArr = panelDataArray.map((pd) => pd.constraints);
+      const {
+        collapsedSize = 0,
+        panelSize = 0,
+        minSize: minSizeFromProps = 0,
+        pivotIndices
+      } = panelDataHelper(panelDataArray, panelData, prevLayout);
+      const minSize = minSizeOverride ?? minSizeFromProps;
+      if (panelSize === collapsedSize) {
+        const prevPanelSize = panelSizeBeforeCollapseRef.current.get(panelData.id);
+        const baseSize = prevPanelSize != null && prevPanelSize >= minSize ? prevPanelSize : minSize;
+        const isLast = findPanelDataIndex(panelDataArray, panelData) === panelDataArray.length - 1;
+        const delta = isLast ? panelSize - baseSize : baseSize - panelSize;
+        const nextLayout = adjustLayoutByDelta({
+          delta,
+          initialLayout: prevLayout,
+          panelConstraints: constraintsArr,
+          pivotIndices,
+          prevLayout,
+          trigger: "imperative-api"
+        });
+        if (!compareLayouts(prevLayout, nextLayout)) {
+          setLayout(nextLayout);
+          eagerValuesRef.current.layout = nextLayout;
+          if (onLayout2) onLayout2(nextLayout);
+          callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
+        }
+      }
+    }
+  }, []);
+  const resizePanel2 = useCallback((panelData, unsafePanelSize) => {
+    const { onLayout: onLayout2 } = committedValuesRef.current;
+    const { layout: prevLayout, panelDataArray } = eagerValuesRef.current;
+    const constraintsArr = panelDataArray.map((pd) => pd.constraints);
+    const { panelSize, pivotIndices } = panelDataHelper(panelDataArray, panelData, prevLayout);
+    if (panelSize == null) {
+      throw new Error(`Panel size not found for ${panelData.id}`);
+    }
+    const isLast = findPanelDataIndex(panelDataArray, panelData) === panelDataArray.length - 1;
+    const delta = isLast ? panelSize - unsafePanelSize : unsafePanelSize - panelSize;
+    const nextLayout = adjustLayoutByDelta({
+      delta,
+      initialLayout: prevLayout,
+      panelConstraints: constraintsArr,
+      pivotIndices,
+      prevLayout,
+      trigger: "mouse-or-touch"
+    });
+    if (!compareLayouts(prevLayout, nextLayout)) {
+      setLayout(nextLayout);
+      eagerValuesRef.current.layout = nextLayout;
+      if (onLayout2) onLayout2(nextLayout);
+      callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
+    }
+  }, []);
+  const reevaluatePanelConstraints = useCallback(
+    (panelData, prevConstraints) => {
+      const { layout: layout2, panelDataArray } = eagerValuesRef.current;
+      const { collapsedSize: prevCollapsed = 0, collapsible: prevCollapsible } = prevConstraints;
+      const {
+        collapsedSize: nextCollapsed = 0,
+        collapsible: nextCollapsible,
+        maxSize: nextMax = 100,
+        minSize: nextMin = 0
+      } = panelData.constraints;
+      const { panelSize: prevPanelSize } = panelDataHelper(panelDataArray, panelData, layout2);
+      if (prevPanelSize == null) return;
+      if (prevCollapsible && nextCollapsible && prevPanelSize === prevCollapsed) {
+        if (prevCollapsed !== nextCollapsed) {
+          resizePanel2(panelData, nextCollapsed);
+        }
+      } else if (prevPanelSize < nextMin) {
+        resizePanel2(panelData, nextMin);
+      } else if (prevPanelSize > nextMax) {
+        resizePanel2(panelData, nextMax);
+      }
+    },
+    [resizePanel2]
+  );
+  const startDragging = useCallback(
+    (dragHandleId, pivotIndices, event) => {
+      if (!panelGroupRef.current) return;
+      panelGroupRef.current.measure((x, y, width, height) => {
+        const isHorizontal = committedValuesRef.current.direction === "horizontal";
+        setDragState({
+          dragHandleId,
+          initialLayout: eagerValuesRef.current.layout,
+          pivotIndices,
+          containerSizePx: isHorizontal ? width : height
+        });
+      });
+    },
+    []
+  );
+  const stopDragging = useCallback(() => {
+    setDragState(null);
+  }, []);
+  const registerResizeHandle = useCallback(
+    (dragHandleId) => {
+      return (event) => {
+        "worklet";
+        const { translationX, translationY } = event;
+        const { direction: direction2, onLayout: onLayout2 } = committedValuesRef.current;
+        const { initialLayout, pivotIndices, containerSizePx } = dragState;
+        const axisDelta = direction2 === "horizontal" ? translationX : translationY;
+        const deltaPercent = axisDelta / containerSizePx * 100;
+        const constraintsArr = eagerValuesRef.current.panelDataArray.map((pd) => pd.constraints);
+        const nextLayout = adjustLayoutByDelta({
+          delta: deltaPercent,
+          initialLayout,
+          panelConstraints: constraintsArr,
+          pivotIndices,
+          prevLayout: initialLayout,
+          trigger: "mouse-or-touch"
+        });
+        if (!compareLayouts(initialLayout, nextLayout)) {
+          runOnJS(setLayout)(nextLayout);
+          eagerValuesRef.current.layout = nextLayout;
+          if (onLayout2) runOnJS(onLayout2)(nextLayout);
+          callPanelCallbacks(
+            eagerValuesRef.current.panelDataArray,
+            nextLayout,
+            panelIdToLastNotifiedSizeMapRef.current
+          );
+        }
+      };
+    },
+    [dragState]
+  );
+  const contextValue = useMemo(
+    () => ({
+      collapsePanel,
+      direction,
+      dragState,
+      expandPanel,
+      getPanelSize: (pd) => {
+        const { layout: arr, panelDataArray } = eagerValuesRef.current;
+        const idx = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
+        return arr[idx];
+      },
+      getPanelStyle: (pd, defaultSize) => {
+        const { layout: arr, panelDataArray } = eagerValuesRef.current;
+        const index = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
+        const sizePct = arr[index];
+        return {
+          flexBasis: `${sizePct}%`,
+          flexGrow: 0,
+          flexShrink: 0
+        };
+      },
+      groupId,
+      isPanelCollapsed: (pd) => {
+        const { layout: arr, panelDataArray } = eagerValuesRef.current;
+        const idx = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
+        const { collapsedSize = 0, collapsible } = pd.constraints;
+        const panelSize = arr[idx];
+        return collapsible === true && panelSize === collapsedSize;
+      },
+      isPanelExpanded: (pd) => {
+        const { layout: arr, panelDataArray } = eagerValuesRef.current;
+        const idx = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
+        const { collapsible, collapsedSize = 0 } = pd.constraints;
+        const panelSize = arr[idx];
+        return !collapsible || panelSize > collapsedSize;
+      },
+      reevaluatePanelConstraints,
+      registerPanel,
+      registerResizeHandle,
+      resizePanel: resizePanel2,
+      startDragging,
+      stopDragging,
+      unregisterPanel
+    }),
+    [
+      collapsePanel,
+      direction,
+      expandPanel,
+      reevaluatePanelConstraints,
+      registerPanel,
+      registerResizeHandle,
+      resizePanel2,
+      startDragging,
+      stopDragging,
+      unregisterPanel
+    ]
+  );
+  const containerStyle = [
+    { flex: 1, flexDirection: direction === "horizontal" ? "row" : "column" },
+    style
+  ];
+  return <PanelGroupContext.Provider value={contextValue}>
+      <View2 ref={panelGroupRef} style={containerStyle} {...viewProps}>
+        {children}
+      </View2>
+    </PanelGroupContext.Provider>;
+}
+function findPanelDataIndex(panelDataArray, panelData) {
+  return panelDataArray.findIndex(
+    (prevPanelData) => prevPanelData === panelData || prevPanelData.id === panelData.id
+  );
+}
+function panelDataHelper(panelDataArray, panelData, layout) {
+  const panelIndex = findPanelDataIndex(panelDataArray, panelData);
+  const isLastPanel = panelIndex === panelDataArray.length - 1;
+  const pivotIndices = isLastPanel ? [panelIndex - 1, panelIndex] : [panelIndex, panelIndex + 1];
+  const panelSize = layout[panelIndex];
+  return {
+    ...panelData.constraints,
+    panelSize,
+    pivotIndices
+  };
+}
+
+// src/PanelResizeHandle.tsx
+import { useContext as useContext2, useRef as useRef4 } from "react";
+import { View as View3 } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+function PanelResizeHandle({
+  style,
+  disabled = false,
+  pivotIndices,
+  onDragging,
+  ...viewProps
+}) {
+  const context = useContext2(PanelGroupContext);
+  if (context === null) {
+    throw new Error("<PanelResizeHandle> must be rendered inside a <PanelGroup>");
+  }
+  const { direction, startDragging, registerResizeHandle, stopDragging } = context;
+  const handleIdRef = useRef4(`resize-handle-${Math.random().toString(36).slice(2)}`);
+  const panGesture = Gesture.Pan().onBegin((e) => {
+    if (disabled) return;
+    onDragging?.(true);
+    startDragging(handleIdRef.current, pivotIndices, e);
+  }).onChange((e) => {
+    if (disabled) return;
+    const resizeHandler = registerResizeHandle(handleIdRef.current);
+    resizeHandler(e);
+  }).onEnd(() => {
+    if (disabled) return;
+    onDragging?.(false);
+    stopDragging();
+  });
+  const defaultHandleStyle = direction === "horizontal" ? { width: 10, alignSelf: "stretch" } : { height: 10, alignSelf: "stretch" };
+  return <GestureDetector gesture={panGesture}>
+      <View3 style={[defaultHandleStyle, style]} />
+    </GestureDetector>;
+}
+
+// src/hooks/usePanelGroupContext.ts
+import { useContext as useContext3 } from "react";
+function usePanelGroupContext() {
+  const context = useContext3(PanelGroupContext);
+  return {
+    direction: context?.direction,
+    groupId: context?.groupId
+  };
+}
+
+// src/utils/csp.ts
+var nonce;
+function setNonce(value) {
+  nonce = value;
+}
+
+// src/utils/dom/getPanelElement.ts
+function getPanelElement(id, scope = document) {
+  const element = scope.querySelector(`[data-panel-id="${id}"]`);
+  if (element) {
+    return element;
+  }
+  return null;
+}
+
+// src/utils/dom/getPanelElementsForGroup.ts
+function getPanelElementsForGroup(groupId, scope = document) {
+  return Array.from(
+    scope.querySelectorAll(`[data-panel][data-panel-group-id="${groupId}"]`)
+  );
+}
+
+// src/utils/dom/isHTMLElement.ts
+function isHTMLElement(target) {
+  if (target instanceof HTMLElement) {
+    return true;
+  }
+  return typeof target === "object" && target !== null && "tagName" in target && "getAttribute" in target;
+}
+
+// src/utils/dom/getPanelGroupElement.ts
+function getPanelGroupElement(id, rootElement = document) {
+  if (isHTMLElement(rootElement) && rootElement.dataset.panelGroupId == id) {
+    return rootElement;
+  }
+  const element = rootElement.querySelector(
+    `[data-panel-group][data-panel-group-id="${id}"]`
+  );
+  if (element) {
+    return element;
+  }
+  return null;
+}
+
+// src/utils/dom/getResizeHandleElement.ts
+function getResizeHandleElement(id, scope = document) {
+  const element = scope.querySelector(
+    `[${DATA_ATTRIBUTES.resizeHandleId}="${id}"]`
+  );
+  if (element) {
+    return element;
+  }
+  return null;
+}
+
+// src/utils/dom/getResizeHandleElementsForGroup.ts
+function getResizeHandleElementsForGroup(groupId, scope = document) {
+  return Array.from(
+    scope.querySelectorAll(
+      `[${DATA_ATTRIBUTES.resizeHandleId}][data-panel-group-id="${groupId}"]`
+    )
+  );
+}
+
+// src/utils/dom/getResizeHandleElementIndex.ts
+function getResizeHandleElementIndex(groupId, id, scope = document) {
+  const handles = getResizeHandleElementsForGroup(groupId, scope);
+  const index = handles.findIndex(
+    (handle) => handle.getAttribute(DATA_ATTRIBUTES.resizeHandleId) === id
+  );
+  return index ?? null;
+}
+
+// src/utils/dom/getResizeHandlePanelIds.ts
+function getResizeHandlePanelIds(groupId, handleId, panelsArray, scope = document) {
+  const handle = getResizeHandleElement(handleId, scope);
+  const handles = getResizeHandleElementsForGroup(groupId, scope);
+  const index = handle ? handles.indexOf(handle) : -1;
+  const idBefore = panelsArray[index]?.id ?? null;
+  const idAfter = panelsArray[index + 1]?.id ?? null;
+  return [idBefore, idAfter];
+}
+
+// src/utils/rects/intersects.ts
+function intersects(rectOne, rectTwo, strict) {
+  if (strict) {
+    return rectOne.x < rectTwo.x + rectTwo.width && rectOne.x + rectOne.width > rectTwo.x && rectOne.y < rectTwo.y + rectTwo.height && rectOne.y + rectOne.height > rectTwo.y;
+  } else {
+    return rectOne.x <= rectTwo.x + rectTwo.width && rectOne.x + rectOne.width >= rectTwo.x && rectOne.y <= rectTwo.y + rectTwo.height && rectOne.y + rectOne.height >= rectTwo.y;
+  }
+}
+
+// src/utils/rects/getIntersectingRectangle.ts
+function getIntersectingRectangle(rectOne, rectTwo, strict) {
+  if (!intersects(rectOne, rectTwo, strict)) {
+    return {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0
+    };
+  }
+  return {
+    x: Math.max(rectOne.x, rectTwo.x),
+    y: Math.max(rectOne.y, rectTwo.y),
+    width: Math.min(rectOne.x + rectOne.width, rectTwo.x + rectTwo.width) - Math.max(rectOne.x, rectTwo.x),
+    height: Math.min(rectOne.y + rectOne.height, rectTwo.y + rectTwo.height) - Math.max(rectOne.y, rectTwo.y)
+  };
+}
+export {
+  DATA_ATTRIBUTES,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+  assert,
+  getIntersectingRectangle,
+  getPanelElement,
+  getPanelElementsForGroup,
+  getPanelGroupElement,
+  getResizeHandleElement,
+  getResizeHandleElementIndex,
+  getResizeHandleElementsForGroup,
+  getResizeHandlePanelIds,
+  intersects,
+  setNonce,
+  usePanelGroupContext
+};

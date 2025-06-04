@@ -1,0 +1,186 @@
+import React, { useContext, useImperativeHandle, useLayoutEffect, useRef } from 'react';
+import { StyleProp, View, ViewProps, ViewStyle } from 'react-native';
+import useUniqueId from './hooks/useUniqueId';
+import { PanelGroupContext } from './PanelGroupContext';
+
+export type PanelOnCollapse = () => void;
+export type PanelOnExpand = () => void;
+export type PanelOnResize = (size: number, prevSize: number | undefined) => void;
+
+export type PanelCallbacks = {
+  onCollapse?: PanelOnCollapse;
+  onExpand?: PanelOnExpand;
+  onResize?: PanelOnResize;
+};
+
+export type PanelConstraints = {
+  collapsedSize?: number;
+  collapsible?: boolean;
+  defaultSize?: number;
+  maxSize?: number;
+  minSize?: number;
+};
+
+export type PanelData = {
+  callbacks: PanelCallbacks;
+  constraints: PanelConstraints;
+  id: string;
+  idIsFromProps: boolean;
+  order?: number;
+};
+
+export type ImperativePanelHandle = {
+  collapse: () => void;
+  expand: (minSize?: number) => void;
+  getId(): string;
+  getSize(): number;
+  isCollapsed: () => boolean;
+  isExpanded: () => boolean;
+  resize: (size: number) => void;
+};
+
+export type PanelProps = ViewProps & {
+  collapsedSize?: number;
+  collapsible?: boolean;
+  defaultSize?: number;
+  id?: string;
+  maxSize?: number;
+  minSize?: number;
+  onCollapse?: PanelOnCollapse;
+  onExpand?: PanelOnExpand;
+  onResize?: PanelOnResize;
+  order?: number;
+  style?: StyleProp<ViewStyle>;
+  children?: React.ReactNode;
+  panelRef?: React.Ref<ImperativePanelHandle>;
+};
+
+export function Panel({
+  children,
+  collapsedSize,
+  collapsible,
+  defaultSize,
+  id: idFromProps,
+  maxSize,
+  minSize,
+  onCollapse,
+  onExpand,
+  onResize,
+  order,
+  style: styleFromProps,
+  panelRef,
+  ...viewProps
+}: PanelProps) {
+  const context = useContext(PanelGroupContext);
+  if (context === null) {
+    throw new Error(`<Panel> must be rendered inside a <PanelGroup>`);
+  }
+
+  const {
+    collapsePanel,
+    expandPanel,
+    getPanelSize,
+    getPanelStyle,
+    isPanelCollapsed,
+    reevaluatePanelConstraints,
+    registerPanel,
+    resizePanel,
+    unregisterPanel,
+  } = context;
+
+  const panelId = useUniqueId(idFromProps);
+
+  const panelDataRef = useRef<PanelData>({
+    callbacks: {
+      onCollapse,
+      onExpand,
+      onResize,
+    },
+    constraints: {
+      collapsedSize,
+      collapsible,
+      defaultSize,
+      maxSize,
+      minSize,
+    },
+    id: panelId,
+    idIsFromProps: idFromProps !== undefined,
+    order,
+  });
+
+  // Sync props→ref and re-evaluate constraints if needed
+  useLayoutEffect(() => {
+    const { callbacks, constraints } = panelDataRef.current;
+    const prevConstraints = { ...constraints };
+
+    panelDataRef.current.id = panelId;
+    panelDataRef.current.idIsFromProps = idFromProps !== undefined;
+    panelDataRef.current.order = order;
+
+    callbacks.onCollapse = onCollapse;
+    callbacks.onExpand = onExpand;
+    callbacks.onResize = onResize;
+
+    constraints.collapsedSize = collapsedSize;
+    constraints.collapsible = collapsible;
+    constraints.defaultSize = defaultSize;
+    constraints.maxSize = maxSize;
+    constraints.minSize = minSize;
+
+    if (
+      prevConstraints.collapsedSize !== constraints.collapsedSize ||
+      prevConstraints.collapsible !== constraints.collapsible ||
+      prevConstraints.maxSize !== constraints.maxSize ||
+      prevConstraints.minSize !== constraints.minSize
+    ) {
+      reevaluatePanelConstraints(panelDataRef.current, prevConstraints);
+    }
+  });
+
+  // Register on mount, unregister on unmount
+  useLayoutEffect(() => {
+    const panelData = panelDataRef.current;
+    registerPanel(panelData);
+    return () => {
+      unregisterPanel(panelData);
+    };
+  }, [order, panelId, registerPanel, unregisterPanel]);
+
+  // Expose imperative methods
+  useImperativeHandle(
+    panelRef,
+    () => ({
+      collapse: () => {
+        collapsePanel(panelDataRef.current);
+      },
+      expand: (minSize?: number) => {
+        expandPanel(panelDataRef.current, minSize);
+      },
+      getId() {
+        return panelId;
+      },
+      getSize() {
+        return getPanelSize(panelDataRef.current);
+      },
+      isCollapsed() {
+        return isPanelCollapsed(panelDataRef.current);
+      },
+      isExpanded() {
+        return !isPanelCollapsed(panelDataRef.current);
+      },
+      resize: (size: number) => {
+        resizePanel(panelDataRef.current, size);
+      },
+    }),
+    [collapsePanel, expandPanel, getPanelSize, isPanelCollapsed, panelId, resizePanel]
+  );
+
+  // Compute RN style for this panel
+  const panelStyle = getPanelStyle(panelDataRef.current, defaultSize) as ViewStyle;
+
+  return (
+    <View {...viewProps} style={[panelStyle, styleFromProps]}>
+      {children}
+    </View>
+  );
+}

@@ -1,0 +1,64 @@
+{
+  "name": "react-native-resizable-panels",
+  "version": "1.0.0",
+  "description": "Resizable panels for React Native",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist .turbo node_modules",
+    "pub:beta": "pnpm publish --no-git-checks --access public --tag beta",
+    "pub:next": "pnpm publish --no-git-checks --access public --tag next",
+    "pub:release": "pnpm publish --access public"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@tsconfig/react-native": "^1.0.1",
+    "eslint-config-resizable-panels": "workspace:*",
+    "tsup": "^8.1.0",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-reanimated": "~3.17.5"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0",
+    "react-native": "*",
+    "react-native-web": "*",
+    "react-native-gesture-handler": ">=2.24.0",
+    "react-native-reanimated": ">=3.17.5"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    },
+    "react-native-web": {
+      "optional": true
+    },
+    "react-native-gesture-handler": { 
+      "optional": true 
+    },
+    "react-native-reanimated": { 
+      "optional": true 
+    }
+  },
+  "eslintConfig": {
+    "extends": "eslint-config-resizable-panels",
+    "ignorePatterns": [
+      "node_modules",
+      "build"
+    ]
+  }
+}
