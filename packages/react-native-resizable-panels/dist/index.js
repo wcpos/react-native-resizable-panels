@@ -72,10 +72,10 @@ function useUniqueId(idFromParams = null) {
 // src/PanelGroupContext.ts
 var import_react2 = require("react");
 var PanelGroupContext = (0, import_react2.createContext)(null);
-PanelGroupContext.displayName = "PanelGroupContext";
 
 // src/Panel.tsx
 function Panel({
+  ref,
   children,
   collapsedSize,
   collapsible,
@@ -88,7 +88,6 @@ function Panel({
   onResize,
   order,
   style: styleFromProps,
-  panelRef,
   ...viewProps
 }) {
   const context = (0, import_react3.useContext)(PanelGroupContext);
@@ -150,7 +149,7 @@ function Panel({
     };
   }, [order, panelId, registerPanel, unregisterPanel]);
   (0, import_react3.useImperativeHandle)(
-    panelRef,
+    ref,
     () => ({
       collapse: () => {
         collapsePanel(panelDataRef.current);
@@ -582,6 +581,7 @@ function validatePanelGroupLayout({
 
 // src/PanelGroup.tsx
 function PanelGroup({
+  ref,
   autoSaveId = null,
   children,
   direction,
@@ -589,7 +589,7 @@ function PanelGroup({
   },
   style,
   ...viewProps
-}, forwardedRef) {
+}) {
   const groupId = (0, import_react4.useRef)(`panel-group-${Math.random().toString(36).slice(2)}`).current;
   const panelGroupRef = (0, import_react4.useRef)(null);
   const [dragState, setDragState] = (0, import_react4.useState)(null);
@@ -597,6 +597,8 @@ function PanelGroup({
   const panelIdToLastNotifiedSizeMapRef = (0, import_react4.useRef)({});
   const panelSizeBeforeCollapseRef = (0, import_react4.useRef)(/* @__PURE__ */ new Map());
   const prevDeltaRef = (0, import_react4.useRef)(0);
+  const handleCountRef = (0, import_react4.useRef)(0);
+  const handleToPivotsRef = (0, import_react4.useRef)({});
   const committedValuesRef = (0, import_react4.useRef)({
     autoSaveId,
     direction,
@@ -609,7 +611,7 @@ function PanelGroup({
     panelDataArrayChanged: false
   });
   (0, import_react4.useImperativeHandle)(
-    forwardedRef,
+    ref,
     () => ({
       getId: () => groupId,
       getLayout: () => eagerValuesRef.current.layout,
@@ -623,7 +625,7 @@ function PanelGroup({
         if (!areEqual(prevLayout, safeLayout)) {
           setLayout(safeLayout);
           eagerValuesRef.current.layout = safeLayout;
-          if (onLayout2) onLayout2(safeLayout);
+          onLayout2?.(safeLayout);
           callPanelCallbacks(panelDataArray, safeLayout, panelIdToLastNotifiedSizeMapRef.current);
         }
       }
@@ -651,7 +653,7 @@ function PanelGroup({
       if (!areEqual(prevLayout, nextLayout)) {
         setLayout(nextLayout);
         eagerValuesRef.current.layout = nextLayout;
-        if (onLayout2) onLayout2(nextLayout);
+        onLayout2?.(nextLayout);
         callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
       }
     }
@@ -667,6 +669,13 @@ function PanelGroup({
       return oa - ob;
     });
     eagerValuesRef.current.panelDataArrayChanged = true;
+  }, []);
+  const registerHandle = (0, import_react4.useCallback)((handleId) => {
+    const leftIndex = handleCountRef.current;
+    const rightIndex = leftIndex + 1;
+    handleToPivotsRef.current[handleId] = [leftIndex, rightIndex];
+    handleCountRef.current += 1;
+    return [leftIndex, rightIndex];
   }, []);
   const unregisterPanel = (0, import_react4.useCallback)((panelData) => {
     const arr = eagerValuesRef.current.panelDataArray;
@@ -705,7 +714,7 @@ function PanelGroup({
         if (!compareLayouts(prevLayout, nextLayout)) {
           setLayout(nextLayout);
           eagerValuesRef.current.layout = nextLayout;
-          if (onLayout2) onLayout2(nextLayout);
+          onLayout2?.(nextLayout);
           callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
         }
       }
@@ -739,7 +748,7 @@ function PanelGroup({
         if (!compareLayouts(prevLayout, nextLayout)) {
           setLayout(nextLayout);
           eagerValuesRef.current.layout = nextLayout;
-          if (onLayout2) onLayout2(nextLayout);
+          onLayout2?.(nextLayout);
           callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
         }
       }
@@ -766,7 +775,7 @@ function PanelGroup({
     if (!compareLayouts(prevLayout, nextLayout)) {
       setLayout(nextLayout);
       eagerValuesRef.current.layout = nextLayout;
-      if (onLayout2) onLayout2(nextLayout);
+      onLayout2?.(nextLayout);
       callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
     }
   }, []);
@@ -795,8 +804,13 @@ function PanelGroup({
     [resizePanel2]
   );
   const startDragging = (0, import_react4.useCallback)(
-    (dragHandleId, pivotIndices, event) => {
+    (dragHandleId, event) => {
       if (!panelGroupRef.current) return;
+      const pivotIndices = handleToPivotsRef.current[dragHandleId];
+      if (!pivotIndices) {
+        console.warn(`Handle "${dragHandleId}" was not found in handleToPivotsRef.`);
+        return;
+      }
       panelGroupRef.current.measure((x, y, width, height) => {
         const isHorizontal = committedValuesRef.current.direction === "horizontal";
         setDragState({
@@ -882,6 +896,7 @@ function PanelGroup({
       },
       reevaluatePanelConstraints,
       registerPanel,
+      registerHandle,
       registerResizeHandle,
       resizePanel: resizePanel2,
       startDragging,
@@ -894,6 +909,7 @@ function PanelGroup({
       expandPanel,
       reevaluatePanelConstraints,
       registerPanel,
+      registerHandle,
       registerResizeHandle,
       resizePanel2,
       startDragging,
@@ -935,7 +951,6 @@ var import_react_native_gesture_handler = require("react-native-gesture-handler"
 function PanelResizeHandle({
   style,
   disabled = false,
-  pivotIndices,
   onDragging,
   ...viewProps
 }) {
@@ -943,12 +958,15 @@ function PanelResizeHandle({
   if (context === null) {
     throw new Error("<PanelResizeHandle> must be rendered inside a <PanelGroup>");
   }
-  const { direction, startDragging, registerResizeHandle, stopDragging } = context;
+  const { direction, startDragging, registerResizeHandle, stopDragging, registerHandle } = context;
   const handleIdRef = (0, import_react5.useRef)(`resize-handle-${Math.random().toString(36).slice(2)}`);
+  (0, import_react5.useEffect)(() => {
+    registerHandle(handleIdRef.current);
+  }, [registerHandle]);
   const panGesture = import_react_native_gesture_handler.Gesture.Pan().onBegin((e) => {
     if (disabled) return;
     onDragging?.(true);
-    startDragging(handleIdRef.current, pivotIndices, e);
+    startDragging(handleIdRef.current, e);
   }).onChange((e) => {
     if (disabled) return;
     const resizeHandler = registerResizeHandle(handleIdRef.current);
@@ -960,7 +978,7 @@ function PanelResizeHandle({
   });
   const defaultHandleStyle = direction === "horizontal" ? { width: 10, alignSelf: "stretch" } : { height: 10, alignSelf: "stretch" };
   return <import_react_native_gesture_handler.GestureDetector gesture={panGesture}>
-      <import_react_native3.View style={[defaultHandleStyle, style]} />
+      <import_react_native3.View style={[defaultHandleStyle, style]} {...viewProps} />
     </import_react_native_gesture_handler.GestureDetector>;
 }
 

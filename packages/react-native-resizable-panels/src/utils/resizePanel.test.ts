@@ -1,8 +1,8 @@
-import { describe, expect, test } from "vitest";
-import { resizePanel } from "./resizePanel";
+import { describe, expect, test } from 'vitest';
+import { resizePanel } from './resizePanel';
 
-describe("resizePanel", () => {
-  test("should not collapse (or expand) until a panel size dips below the halfway point between min size and collapsed size", () => {
+describe('resizePanel', () => {
+  test('should not collapse (or expand) until a panel size dips below the halfway point between min size and collapsed size', () => {
     expect(
       resizePanel({
         panelConstraints: [

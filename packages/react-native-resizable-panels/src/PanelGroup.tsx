@@ -1,4 +1,5 @@
 import React, {
+  ReactNode,
   useCallback,
   useImperativeHandle,
   useLayoutEffect,
@@ -14,7 +15,7 @@ import {
 } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 
-import { PanelConstraints, PanelData } from './Panel';
+import type { PanelConstraints, PanelData } from './Panel';
 import { DragState, PanelGroupContext, TPanelGroupContext } from './PanelGroupContext';
 import { Direction } from './types';
 import { adjustLayoutByDelta } from './utils/adjustLayoutByDelta';
@@ -38,23 +39,23 @@ export interface PanelGroupStorage {
 }
 
 export interface PanelGroupProps extends Omit<ViewProps, 'onLayout'> {
+  ref?: React.Ref<ImperativePanelGroupHandle>;
   autoSaveId?: string | null;
   direction: Direction;
   onLayout?: (layout: number[]) => void;
   style?: StyleProp<ViewStyle>;
+  children?: ReactNode;
 }
 
-export function PanelGroup(
-  {
-    autoSaveId = null,
-    children,
-    direction,
-    onLayout = () => {},
-    style,
-    ...viewProps
-  }: PanelGroupProps,
-  forwardedRef: React.ForwardedRef<ImperativePanelGroupHandle>
-) {
+export function PanelGroup({
+  ref,
+  autoSaveId = null,
+  children,
+  direction,
+  onLayout = () => {},
+  style,
+  ...viewProps
+}: PanelGroupProps) {
   const groupId = useRef<string>(`panel-group-${Math.random().toString(36).slice(2)}`).current;
   const panelGroupRef = useRef<View | null>(null);
 
@@ -64,6 +65,9 @@ export function PanelGroup(
   const panelIdToLastNotifiedSizeMapRef = useRef<Record<string, number>>({});
   const panelSizeBeforeCollapseRef = useRef<Map<string, number>>(new Map());
   const prevDeltaRef = useRef<number>(0);
+
+  const handleCountRef = useRef<number>(0);
+  const handleToPivotsRef = useRef<Record<string, [number, number]>>({});
 
   const committedValuesRef = useRef<{
     autoSaveId: string | null;
@@ -87,9 +91,8 @@ export function PanelGroup(
     panelDataArrayChanged: false,
   });
 
-  // Imperative handle for parent components
   useImperativeHandle(
-    forwardedRef,
+    ref,
     () => ({
       getId: () => groupId,
       getLayout: () => eagerValuesRef.current.layout,
@@ -105,7 +108,7 @@ export function PanelGroup(
         if (!areEqual(prevLayout, safeLayout)) {
           setLayout(safeLayout);
           eagerValuesRef.current.layout = safeLayout;
-          if (onLayout) onLayout(safeLayout);
+          onLayout?.(safeLayout);
           callPanelCallbacks(panelDataArray, safeLayout, panelIdToLastNotifiedSizeMapRef.current);
         }
       },
@@ -113,7 +116,6 @@ export function PanelGroup(
     []
   );
 
-  // Keep refs up to date
   useLayoutEffect(() => {
     committedValuesRef.current = {
       autoSaveId,
@@ -123,7 +125,6 @@ export function PanelGroup(
     };
   }, [autoSaveId, direction, dragState, onLayout]);
 
-  // Re-compute layout whenever panels register/unregister
   useLayoutEffect(() => {
     if (eagerValuesRef.current.panelDataArrayChanged) {
       eagerValuesRef.current.panelDataArrayChanged = false;
@@ -139,13 +140,12 @@ export function PanelGroup(
       if (!areEqual(prevLayout, nextLayout)) {
         setLayout(nextLayout);
         eagerValuesRef.current.layout = nextLayout;
-        if (onLayout) onLayout(nextLayout);
+        onLayout?.(nextLayout);
         callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
       }
     }
   }, []);
 
-  // Register / unregister
   const registerPanel = useCallback((panelData: PanelData) => {
     const arr = eagerValuesRef.current.panelDataArray;
     arr.push(panelData);
@@ -158,6 +158,14 @@ export function PanelGroup(
       return oa - ob;
     });
     eagerValuesRef.current.panelDataArrayChanged = true;
+  }, []);
+
+  const registerHandle = useCallback((handleId: string): [number, number] => {
+    const leftIndex = handleCountRef.current;
+    const rightIndex = leftIndex + 1;
+    handleToPivotsRef.current[handleId] = [leftIndex, rightIndex];
+    handleCountRef.current += 1;
+    return [leftIndex, rightIndex];
   }, []);
 
   const unregisterPanel = useCallback((panelData: PanelData) => {
@@ -201,7 +209,7 @@ export function PanelGroup(
         if (!compareLayouts(prevLayout, nextLayout)) {
           setLayout(nextLayout);
           eagerValuesRef.current.layout = nextLayout;
-          if (onLayout) onLayout(nextLayout);
+          onLayout?.(nextLayout);
           callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
         }
       }
@@ -241,7 +249,7 @@ export function PanelGroup(
         if (!compareLayouts(prevLayout, nextLayout)) {
           setLayout(nextLayout);
           eagerValuesRef.current.layout = nextLayout;
-          if (onLayout) onLayout(nextLayout);
+          onLayout?.(nextLayout);
           callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
         }
       }
@@ -274,7 +282,7 @@ export function PanelGroup(
     if (!compareLayouts(prevLayout, nextLayout)) {
       setLayout(nextLayout);
       eagerValuesRef.current.layout = nextLayout;
-      if (onLayout) onLayout(nextLayout);
+      onLayout?.(nextLayout);
       callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
     }
   }, []);
@@ -282,7 +290,6 @@ export function PanelGroup(
   const reevaluatePanelConstraints = useCallback(
     (panelData: PanelData, prevConstraints: PanelConstraints) => {
       const { layout, panelDataArray } = eagerValuesRef.current;
-
       const { collapsedSize: prevCollapsed = 0, collapsible: prevCollapsible } = prevConstraints;
       const {
         collapsedSize: nextCollapsed = 0,
@@ -307,14 +314,17 @@ export function PanelGroup(
     [resizePanel]
   );
 
-  // Start / stop dragging: measure container and store initial state
   const startDragging = useCallback(
-    (
-      dragHandleId: string,
-      pivotIndices: [number, number],
-      event: GestureStateChangeEvent<PanGestureHandlerEventPayload>
-    ) => {
+    (dragHandleId: string, event: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => {
       if (!panelGroupRef.current) return;
+
+      // Look up pivotIndices that were saved when registerHandle(handleId) ran:
+      const pivotIndices = handleToPivotsRef.current[dragHandleId];
+      if (!pivotIndices) {
+        console.warn(`Handle "${dragHandleId}" was not found in handleToPivotsRef.`);
+        return;
+      }
+
       panelGroupRef.current.measure((x, y, width, height) => {
         const isHorizontal = committedValuesRef.current.direction === 'horizontal';
         setDragState({
@@ -332,7 +342,6 @@ export function PanelGroup(
     setDragState(null);
   }, []);
 
-  // registerResizeHandle will return a function that PanGestureHandler calls on change
   const registerResizeHandle = useCallback(
     (dragHandleId: string) => {
       return (event: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
@@ -368,7 +377,6 @@ export function PanelGroup(
     [dragState]
   );
 
-  // Context value
   const contextValue: TPanelGroupContext = useMemo(
     () => ({
       collapsePanel,
@@ -407,6 +415,7 @@ export function PanelGroup(
       },
       reevaluatePanelConstraints,
       registerPanel,
+      registerHandle,
       registerResizeHandle,
       resizePanel,
       startDragging,
@@ -419,6 +428,7 @@ export function PanelGroup(
       expandPanel,
       reevaluatePanelConstraints,
       registerPanel,
+      registerHandle,
       registerResizeHandle,
       resizePanel,
       startDragging,
@@ -449,12 +459,9 @@ function findPanelDataIndex(panelDataArray: PanelData[], panelData: PanelData) {
 
 function panelDataHelper(panelDataArray: PanelData[], panelData: PanelData, layout: number[]) {
   const panelIndex = findPanelDataIndex(panelDataArray, panelData);
-
   const isLastPanel = panelIndex === panelDataArray.length - 1;
   const pivotIndices = isLastPanel ? [panelIndex - 1, panelIndex] : [panelIndex, panelIndex + 1];
-
   const panelSize = layout[panelIndex];
-
   return {
     ...panelData.constraints,
     panelSize,

@@ -1,9 +1,9 @@
-import { describe, expect, test } from "vitest";
-import { verifyExpectedWarnings } from "./test-utils";
-import { validatePanelGroupLayout } from "./validatePanelGroupLayout";
+import { describe, expect, test } from 'vitest';
+import { verifyExpectedWarnings } from './test-utils';
+import { validatePanelGroupLayout } from './validatePanelGroupLayout';
 
-describe("validatePanelGroupLayout", () => {
-  test("should accept requested layout if there are no constraints provided", () => {
+describe('validatePanelGroupLayout', () => {
+  test('should accept requested layout if there are no constraints provided', () => {
     expect(
       validatePanelGroupLayout({
         layout: [10, 60, 30],
@@ -12,14 +12,14 @@ describe("validatePanelGroupLayout", () => {
     ).toEqual([10, 60, 30]);
   });
 
-  test("should normalize layouts that do not total 100%", () => {
+  test('should normalize layouts that do not total 100%', () => {
     let layout;
     verifyExpectedWarnings(() => {
       layout = validatePanelGroupLayout({
         layout: [10, 20, 20],
         panelConstraints: [{}, {}, {}],
       });
-    }, "Invalid layout total size");
+    }, 'Invalid layout total size');
     expect(layout).toEqual([20, 40, 40]);
 
     verifyExpectedWarnings(() => {
@@ -27,28 +27,28 @@ describe("validatePanelGroupLayout", () => {
         layout: [50, 100, 50],
         panelConstraints: [{}, {}, {}],
       });
-    }, "Invalid layout total size");
+    }, 'Invalid layout total size');
     expect(layout).toEqual([25, 50, 25]);
   });
 
-  test("should reject layouts that do not match the number of panels", () => {
+  test('should reject layouts that do not match the number of panels', () => {
     expect(() =>
       validatePanelGroupLayout({
         layout: [10, 20, 30],
         panelConstraints: [{}, {}],
       })
-    ).toThrow("Invalid 2 panel layout");
+    ).toThrow('Invalid 2 panel layout');
 
     expect(() =>
       validatePanelGroupLayout({
         layout: [50, 50],
         panelConstraints: [{}, {}, {}],
       })
-    ).toThrow("Invalid 3 panel layout");
+    ).toThrow('Invalid 3 panel layout');
   });
 
-  describe("minimum size constraints", () => {
-    test("should adjust the layout to account for minimum percentage sizes", () => {
+  describe('minimum size constraints', () => {
+    test('should adjust the layout to account for minimum percentage sizes', () => {
       expect(
         validatePanelGroupLayout({
           layout: [25, 75],
@@ -62,7 +62,7 @@ describe("validatePanelGroupLayout", () => {
       ).toEqual([35, 65]);
     });
 
-    test("should account for multiple panels with minimum size constraints", () => {
+    test('should account for multiple panels with minimum size constraints', () => {
       expect(
         validatePanelGroupLayout({
           layout: [20, 60, 20],
@@ -80,8 +80,8 @@ describe("validatePanelGroupLayout", () => {
     });
   });
 
-  describe("maximum size constraints", () => {
-    test("should adjust the layout to account for maximum percentage sizes", () => {
+  describe('maximum size constraints', () => {
+    test('should adjust the layout to account for maximum percentage sizes', () => {
       expect(
         validatePanelGroupLayout({
           layout: [25, 75],
@@ -90,7 +90,7 @@ describe("validatePanelGroupLayout", () => {
       ).toEqual([35, 65]);
     });
 
-    test("should account for multiple panels with maximum size constraints", () => {
+    test('should account for multiple panels with maximum size constraints', () => {
       expect(
         validatePanelGroupLayout({
           layout: [20, 60, 20],
@@ -106,7 +106,7 @@ describe("validatePanelGroupLayout", () => {
     });
   });
 
-  describe("collapsible panels", () => {
+  describe('collapsible panels', () => {
     test("should not collapse a panel that's at or above the minimum size", () => {
       expect(
         validatePanelGroupLayout({
@@ -116,7 +116,7 @@ describe("validatePanelGroupLayout", () => {
       ).toEqual([25, 75]);
     });
 
-    test("should collapse a panel once it drops below the halfway point between collapsed and minimum percentage sizes", () => {
+    test('should collapse a panel once it drops below the halfway point between collapsed and minimum percentage sizes', () => {
       expect(
         validatePanelGroupLayout({
           layout: [15, 85],

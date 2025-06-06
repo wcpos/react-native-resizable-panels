@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
@@ -17,12 +17,6 @@ export type PanelResizeHandleProps = {
   disabled?: boolean;
 
   /**
-   * The two panel indices that this handle sits between.
-   * E.g. if this handle is between panels 1 and 2, pass [1, 2].
-   */
-  pivotIndices: [number, number];
-
-  /**
    * A callback that is called when the handle is dragged.
    */
   onDragging?: PanelResizeHandleOnDragging;
@@ -35,7 +29,6 @@ export type PanelResizeHandleProps = {
 export function PanelResizeHandle({
   style,
   disabled = false,
-  pivotIndices,
   onDragging,
   ...viewProps
 }: PanelResizeHandleProps) {
@@ -44,10 +37,16 @@ export function PanelResizeHandle({
     throw new Error('<PanelResizeHandle> must be rendered inside a <PanelGroup>');
   }
 
-  const { direction, startDragging, registerResizeHandle, stopDragging } = context;
+  const { direction, startDragging, registerResizeHandle, stopDragging, registerHandle } = context;
 
   // Give each handle a stable unique ID, so the parent can track them separately.
   const handleIdRef = useRef<string>(`resize-handle-${Math.random().toString(36).slice(2)}`);
+
+  useEffect(() => {
+    registerHandle(handleIdRef.current);
+    // no cleanup needed—if the handle unmounts, the group will eventually drop its map entry
+    // (or you could add an unregisterHandle if you want).
+  }, [registerHandle]);
 
   // Create a Pan gesture. onBegin triggers startDragging,
   // onUpdate runs the resize handler, onEnd calls stopDragging.
@@ -55,7 +54,7 @@ export function PanelResizeHandle({
     .onBegin((e) => {
       if (disabled) return;
       onDragging?.(true);
-      startDragging(handleIdRef.current, pivotIndices, e);
+      startDragging(handleIdRef.current, e);
     })
     .onChange((e) => {
       if (disabled) return;
@@ -81,7 +80,7 @@ export function PanelResizeHandle({
 
   return (
     <GestureDetector gesture={panGesture}>
-      <View style={[defaultHandleStyle, style]} />
+      <View style={[defaultHandleStyle, style]} {...viewProps} />
     </GestureDetector>
   );
 }

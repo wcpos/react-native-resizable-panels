@@ -52,10 +52,11 @@ export type PanelProps = ViewProps & {
   order?: number;
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
-  panelRef?: React.Ref<ImperativePanelHandle>;
+  ref?: React.Ref<ImperativePanelHandle>;
 };
 
 export function Panel({
+  ref,
   children,
   collapsedSize,
   collapsible,
@@ -68,7 +69,6 @@ export function Panel({
   onResize,
   order,
   style: styleFromProps,
-  panelRef,
   ...viewProps
 }: PanelProps) {
   const context = useContext(PanelGroupContext);
@@ -148,7 +148,7 @@ export function Panel({
 
   // Expose imperative methods
   useImperativeHandle(
-    panelRef,
+    ref,
     () => ({
       collapse: () => {
         collapsePanel(panelDataRef.current);

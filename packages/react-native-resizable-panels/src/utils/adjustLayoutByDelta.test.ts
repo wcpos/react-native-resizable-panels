@@ -1,8 +1,8 @@
-import { describe, expect, test } from "vitest";
-import { adjustLayoutByDelta } from "./adjustLayoutByDelta";
+import { describe, expect, test } from 'vitest';
+import { adjustLayoutByDelta } from './adjustLayoutByDelta';
 
-describe("adjustLayoutByDelta", () => {
-  test("[1++,2]", () => {
+describe('adjustLayoutByDelta', () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 1,
@@ -10,12 +10,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([51, 49]);
   });
 
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 25,
@@ -23,7 +23,7 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([75, 25]);
     expect(
@@ -33,12 +33,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([100, 0]);
   });
 
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 50,
@@ -55,12 +55,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([60, 40]);
   });
 
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 25,
@@ -75,12 +75,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([75, 25]);
   });
 
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 40,
@@ -95,14 +95,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([95, 5]);
   });
 
   // Edge case
   // Expanding from a collapsed state to less than the min size via imperative API should do nothing
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 5,
@@ -117,14 +117,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [10, 90],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([10, 90]);
   });
 
   // Edge case
   // Keyboard interactions should always expand a collapsed panel
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 5,
@@ -139,14 +139,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [10, 90],
-        trigger: "keyboard",
+        trigger: 'keyboard',
       })
     ).toEqual([25, 75]);
   });
 
   // Edge case
   // Keyboard interactions should always collapse a collapsible panel once it's at the minimum size
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 5,
@@ -160,14 +160,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [75, 25],
-        trigger: "keyboard",
+        trigger: 'keyboard',
       })
     ).toEqual([100, 0]);
   });
 
   // Edge case
   // Expanding from a collapsed state to less than the min size via imperative API should do nothing
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 1,
@@ -186,14 +186,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [4, 96],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([4, 96]);
   });
 
   // Edge case
   // Expanding from a collapsed state to less than the min size via keyboard should snap to min size
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 1,
@@ -212,14 +212,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [4, 96],
-        trigger: "keyboard",
+        trigger: 'keyboard',
       })
     ).toEqual([6, 94]);
   });
 
   // Edge case
   // Expanding from a collapsed state to greater than the max size
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 25,
@@ -238,14 +238,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [4, 96],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([15, 85]);
   });
 
   // Edge case
   // Expanding from a collapsed state mimicking an imperative API call
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 30,
@@ -263,14 +263,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [5, 95],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([35, 65]);
   });
 
   // Edge case
   // Expanding from a collapsed state mimicking an keyboard event
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 30,
@@ -288,14 +288,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [5, 95],
-        trigger: "keyboard",
+        trigger: 'keyboard',
       })
     ).toEqual([35, 65]);
   });
 
   // Edge case
   // Expanding from a collapsed state mimicking an keyboard event when there is no min size
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 30,
@@ -311,12 +311,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [0, 100],
-        trigger: "keyboard",
+        trigger: 'keyboard',
       })
     ).toEqual([30, 70]);
   });
 
-  test("[1--,2]", () => {
+  test('[1--,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -1,
@@ -324,12 +324,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([49, 51]);
   });
 
-  test("[1--,2]", () => {
+  test('[1--,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -25,
@@ -337,12 +337,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 75]);
   });
 
-  test("[1--,2]", () => {
+  test('[1--,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -350,12 +350,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([0, 100]);
   });
 
-  test("[1--,2]", () => {
+  test('[1--,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -372,12 +372,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 80]);
   });
 
-  test("[1--,2]", () => {
+  test('[1--,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -25,
@@ -392,12 +392,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 75]);
   });
 
-  test("[1--,2]", () => {
+  test('[1--,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -30,
@@ -412,7 +412,7 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 75]);
 
@@ -430,12 +430,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 95]);
   });
 
-  test("[1--,2]", () => {
+  test('[1--,2]', () => {
     // Edge case
     // The second panel should prevent the first panel from collapsing
     expect(
@@ -452,14 +452,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [50, 50],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 75]);
   });
 
   // Edge case
   // Keyboard interactions should always expand a collapsed panel
-  test("[1--,2]", () => {
+  test('[1--,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -5,
@@ -474,14 +474,14 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [90, 10],
-        trigger: "keyboard",
+        trigger: 'keyboard',
       })
     ).toEqual([75, 25]);
   });
 
   // Edge case
   // Keyboard interactions should always collapse a collapsible panel once it's at the minimum size
-  test("[1++,2]", () => {
+  test('[1++,2]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -5,
@@ -496,12 +496,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 75],
-        trigger: "keyboard",
+        trigger: 'keyboard',
       })
     ).toEqual([10, 90]);
   });
 
-  test("[1++,2,3]", () => {
+  test('[1++,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 1,
@@ -509,12 +509,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([26, 49, 25]);
   });
 
-  test("[1++,2,3]", () => {
+  test('[1++,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 25,
@@ -522,12 +522,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([50, 25, 25]);
   });
 
-  test("[1++,2,3]", () => {
+  test('[1++,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 50,
@@ -535,12 +535,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([75, 0, 25]);
   });
 
-  test("[1++,2,3]", () => {
+  test('[1++,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 75,
@@ -548,12 +548,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([100, 0, 0]);
   });
 
-  test("[1++,2,3]", () => {
+  test('[1++,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 25,
@@ -561,12 +561,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{ maxSize: 35 }, { minSize: 25 }, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([35, 40, 25]);
   });
 
-  test("[1++,2,3]", () => {
+  test('[1++,2,3]', () => {
     // Any further than the max size should stop the drag/keyboard resize
     expect(
       adjustLayoutByDelta({
@@ -575,12 +575,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{ maxSize: 35 }, { minSize: 25 }, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([35, 40, 25]);
   });
 
-  test("[1++,2,3]", () => {
+  test('[1++,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 5,
@@ -596,12 +596,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 40, 35],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([30, 35, 35]);
   });
 
-  test("[1++,2,3]", () => {
+  test('[1++,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 26,
@@ -617,12 +617,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 40, 35],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([60, 5, 35]);
   });
 
-  test("[1++,2,3]", () => {
+  test('[1++,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 80,
@@ -638,12 +638,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 40, 35],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([70, 5, 25]);
   });
 
-  test("[1--,2,3]", () => {
+  test('[1--,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -1,
@@ -651,12 +651,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([24, 51, 25]);
   });
 
-  test("[1--,2,3]", () => {
+  test('[1--,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -25,
@@ -664,12 +664,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([0, 75, 25]);
   });
 
-  test("[1--,2,3]", () => {
+  test('[1--,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -1,
@@ -677,12 +677,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{ minSize: 20 }, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([24, 51, 25]);
   });
 
-  test("[1--,2,3]", () => {
+  test('[1--,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -10,
@@ -690,12 +690,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{ minSize: 20 }, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 55, 25]);
   });
 
-  test("[1--,2,3]", () => {
+  test('[1--,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -5,
@@ -709,12 +709,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 55, 25]);
   });
 
-  test("[1--,2,3]", () => {
+  test('[1--,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -20,
@@ -728,12 +728,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([10, 65, 25]);
   });
 
-  test("[1--,2,3]", () => {
+  test('[1--,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -10,
@@ -749,12 +749,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([15, 60, 25]);
   });
 
-  test("[1--,2,3]", () => {
+  test('[1--,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -20,
@@ -770,12 +770,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 70, 25]);
   });
 
-  test("[1--,2,3]", () => {
+  test('[1--,2,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -20,
@@ -793,12 +793,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [45, 50, 5],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 50, 25]);
   });
 
-  test("[1,2++,3]", () => {
+  test('[1,2++,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -1,
@@ -806,12 +806,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 49, 26]);
   });
 
-  test("[1,2++,3]", () => {
+  test('[1,2++,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -25,
@@ -819,12 +819,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 25, 50]);
   });
 
-  test("[1,2++,3]", () => {
+  test('[1,2++,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -832,12 +832,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 0, 75]);
   });
 
-  test("[1,2++,3]", () => {
+  test('[1,2++,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -75,
@@ -845,12 +845,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([0, 0, 100]);
   });
 
-  test("[1,2++,3]", () => {
+  test('[1,2++,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 5,
@@ -858,12 +858,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, { minSize: 15 }],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 55, 20]);
   });
 
-  test("[1,2++,3]", () => {
+  test('[1,2++,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 20,
@@ -871,12 +871,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, { minSize: 15 }],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 60, 15]);
   });
 
-  test("[1,2++,3]", () => {
+  test('[1,2++,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 5,
@@ -884,12 +884,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, { collapsible: true, minSize: 20 }],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 55, 20]);
   });
 
-  test("[1,2++,3]", () => {
+  test('[1,2++,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 10,
@@ -897,7 +897,7 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, { collapsible: true, minSize: 20 }],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 55, 20]);
 
@@ -908,12 +908,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, { collapsible: true, minSize: 20 }],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 75, 0]);
   });
 
-  test("[1,2--,3]", () => {
+  test('[1,2--,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 1,
@@ -921,12 +921,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 51, 24]);
   });
 
-  test("[1,2--,3]", () => {
+  test('[1,2--,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 25,
@@ -934,12 +934,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 75, 0]);
   });
 
-  test("[1,2--,3]", () => {
+  test('[1,2--,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -20,
@@ -947,12 +947,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, { minSize: 40 }, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([15, 40, 45]);
   });
 
-  test("[1,2--,3]", () => {
+  test('[1,2--,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -10,
@@ -960,12 +960,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, { maxSize: 30 }],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 45, 30]);
   });
 
-  test("[1,2--,3]", () => {
+  test('[1,2--,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -35,
@@ -981,7 +981,7 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 20, 60]);
 
@@ -1000,12 +1000,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 50, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 5, 70]);
   });
 
-  test("[1,2--,3]", () => {
+  test('[1,2--,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -10,
@@ -1021,7 +1021,7 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 0, 75],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 0, 80]);
 
@@ -1040,13 +1040,13 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 0, 75],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 0, 95]);
   });
 
   // Edge case
-  test("[1,2--,3]", () => {
+  test('[1,2--,3]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -100,
@@ -1054,12 +1054,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [100 / 3, 100 / 3, 100 / 3],
-        trigger: "mouse-or-touch",
+        trigger: 'mouse-or-touch',
       })
     ).toEqual([0, 0, 100]);
   });
 
-  test("[1++,2,3,4]", () => {
+  test('[1++,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 1,
@@ -1067,12 +1067,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([26, 24, 25, 25]);
   });
 
-  test("[1++,2,3,4]", () => {
+  test('[1++,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 25,
@@ -1080,12 +1080,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([50, 0, 25, 25]);
   });
 
-  test("[1++,2,3,4]", () => {
+  test('[1++,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 50,
@@ -1093,12 +1093,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([75, 0, 0, 25]);
   });
 
-  test("[1++,2,3,4]", () => {
+  test('[1++,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 75,
@@ -1106,12 +1106,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([100, 0, 0, 0]);
   });
 
-  test("[1++,2,3,4]", () => {
+  test('[1++,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 25,
@@ -1119,30 +1119,25 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{ maxSize: 35 }, {}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([35, 15, 25, 25]);
   });
 
-  test("[1++,2,3,4]", () => {
+  test('[1++,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 100,
         initialLayout: [25, 25, 25, 25],
-        panelConstraints: [
-          {},
-          { minSize: 10 },
-          { minSize: 10 },
-          { minSize: 10 },
-        ],
+        panelConstraints: [{}, { minSize: 10 }, { minSize: 10 }, { minSize: 10 }],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([70, 10, 10, 10]);
   });
 
-  test("[1++,2,3,4]", () => {
+  test('[1++,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 10,
@@ -1167,7 +1162,7 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([35, 20, 20, 25]);
 
@@ -1195,12 +1190,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([45, 5, 25, 25]);
   });
 
-  test("[1++,2,3,4]", () => {
+  test('[1++,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 40,
@@ -1225,12 +1220,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([65, 5, 5, 25]);
   });
 
-  test("[1++,2,3,4]", () => {
+  test('[1++,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 100,
@@ -1255,12 +1250,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([85, 5, 5, 5]);
   });
 
-  test("[1--,2,3,4]", () => {
+  test('[1--,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -1,
@@ -1268,12 +1263,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([24, 26, 25, 25]);
   });
 
-  test("[1--,2,3,4]", () => {
+  test('[1--,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -25,
@@ -1281,12 +1276,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([0, 50, 25, 25]);
   });
 
-  test("[1--,2,3,4]", () => {
+  test('[1--,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -10,
@@ -1294,12 +1289,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{ minSize: 20 }, {}, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 30, 25, 25]);
   });
 
-  test("[1--,2,3,4]", () => {
+  test('[1--,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -25,
@@ -1307,12 +1302,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, { maxSize: 35 }, {}, {}],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([0, 35, 40, 25]);
   });
 
-  test("[1--,2,3,4]", () => {
+  test('[1--,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -10,
@@ -1329,7 +1324,7 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 30, 25, 25]);
 
@@ -1349,12 +1344,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 45, 25, 25]);
   });
 
-  test("[1--,2,3,4]", () => {
+  test('[1--,2,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -10,
@@ -1371,7 +1366,7 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 30, 25, 25]);
 
@@ -1391,12 +1386,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 35, 35, 25]);
   });
 
-  test("[1--,2,3,4]", () => {
+  test('[1--,2,3,4]', () => {
     // This might be controversial behavior;
     // Perhaps the 1st panel should collapse
     // rather than being blocked by the max size constraints of the 2nd panel
@@ -1419,12 +1414,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 30, 25, 25]);
   });
 
-  test("[1--,2,3,4]", () => {
+  test('[1--,2,3,4]', () => {
     // This might be controversial behavior;
     // Perhaps the 1st panel should collapse
     // rather than being blocked by the max size constraints of the 2nd panel
@@ -1447,13 +1442,13 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 30, 25, 25]);
   });
 
   // Edge case (issues/210)
-  test("[1--,2,3,4]", () => {
+  test('[1--,2,3,4]', () => {
     // If the size doesn't drop below the halfway point, the panel should not collapse
     expect(
       adjustLayoutByDelta({
@@ -1471,7 +1466,7 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 30, 25, 25]);
 
@@ -1494,12 +1489,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 35, 35, 25]);
   });
 
-  test("[1,2++,3,4]", () => {
+  test('[1,2++,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 10,
@@ -1507,12 +1502,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 35, 15, 25]);
   });
 
-  test("[1,2++,3,4]", () => {
+  test('[1,2++,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 30,
@@ -1520,12 +1515,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 55, 0, 20]);
   });
 
-  test("[1,2++,3,4]", () => {
+  test('[1,2++,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 50,
@@ -1533,12 +1528,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 75, 0, 0]);
   });
 
-  test("[1,2++,3,4]", () => {
+  test('[1,2++,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 50,
@@ -1546,12 +1541,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, { maxSize: 35 }, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([65, 35, 0, 0]);
   });
 
-  test("[1,2++,3,4]", () => {
+  test('[1,2++,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 50,
@@ -1559,12 +1554,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, { minSize: 20 }, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 55, 20, 0]);
   });
 
-  test("[1,2++,3,4]", () => {
+  test('[1,2++,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 10,
@@ -1581,12 +1576,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 35, 15, 25]);
   });
 
-  test("[1,2++,3,4]", () => {
+  test('[1,2++,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 30,
@@ -1603,12 +1598,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 55, 5, 15]);
   });
 
-  test("[1,2++,3,4]", () => {
+  test('[1,2++,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 50,
@@ -1625,12 +1620,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 60, 5, 10]);
   });
 
-  test("[1,2--,3,4]", () => {
+  test('[1,2--,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -25,
@@ -1638,12 +1633,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 0, 50, 25]);
   });
 
-  test("[1,2--,3,4]", () => {
+  test('[1,2--,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -1651,12 +1646,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([0, 0, 75, 25]);
   });
 
-  test("[1,2--,3,4]", () => {
+  test('[1,2--,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -1664,12 +1659,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, { minSize: 20 }, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([0, 20, 55, 25]);
   });
 
-  test("[1,2--,3,4]", () => {
+  test('[1,2--,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -1677,12 +1672,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{ minSize: 20 }, {}, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 0, 55, 25]);
   });
 
-  test("[1,2--,3,4]", () => {
+  test('[1,2--,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -1690,12 +1685,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{ minSize: 20 }, { minSize: 20 }, {}, {}],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 20, 35, 25]);
   });
 
-  test("[1,2--,3,4]", () => {
+  test('[1,2--,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -5,
@@ -1712,12 +1707,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 20, 30, 25]);
   });
 
-  test("[1,2--,3,4]", () => {
+  test('[1,2--,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -1734,12 +1729,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 0, 70, 25]);
   });
 
-  test("[1,2--,3,4]", () => {
+  test('[1,2--,3,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -1756,12 +1751,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [1, 2],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([0, 5, 70, 25]);
   });
 
-  test("[1,2,3++,4]", () => {
+  test('[1,2,3++,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 10,
@@ -1769,12 +1764,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 25, 35, 15]);
   });
 
-  test("[1,2,3++,4]", () => {
+  test('[1,2,3++,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 30,
@@ -1782,12 +1777,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 25, 50, 0]);
   });
 
-  test("[1,2,3++,4]", () => {
+  test('[1,2,3++,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 30,
@@ -1795,12 +1790,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, { maxSize: 40 }, {}],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 35, 40, 0]);
   });
 
-  test("[1,2,3++,4]", () => {
+  test('[1,2,3++,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 30,
@@ -1808,12 +1803,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, { minSize: 10 }],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 25, 40, 10]);
   });
 
-  test("[1,2,3++,4]", () => {
+  test('[1,2,3++,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 5,
@@ -1830,12 +1825,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 25, 30, 20]);
   });
 
-  test("[1,2,3++,4]", () => {
+  test('[1,2,3++,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: 50,
@@ -1852,12 +1847,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 25, 45, 5]);
   });
 
-  test("[1,2,3--,4]", () => {
+  test('[1,2,3--,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -10,
@@ -1865,12 +1860,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 25, 15, 35]);
   });
 
-  test("[1,2,3--,4]", () => {
+  test('[1,2,3--,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -40,
@@ -1878,12 +1873,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 10, 0, 65]);
   });
 
-  test("[1,2,3--,4]", () => {
+  test('[1,2,3--,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -100,
@@ -1891,30 +1886,25 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, {}],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([0, 0, 0, 100]);
   });
 
-  test("[1,2,3--,4]", () => {
+  test('[1,2,3--,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
         initialLayout: [25, 25, 25, 25],
-        panelConstraints: [
-          { minSize: 10 },
-          { minSize: 10 },
-          { minSize: 10 },
-          {},
-        ],
+        panelConstraints: [{ minSize: 10 }, { minSize: 10 }, { minSize: 10 }, {}],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([10, 10, 10, 70]);
   });
 
-  test("[1,2,3--,4]", () => {
+  test('[1,2,3--,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -1922,12 +1912,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, {}, {}, { maxSize: 40 }],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([25, 25, 10, 40]);
   });
 
-  test("[1,2,3--,4]", () => {
+  test('[1,2,3--,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -50,
@@ -1935,12 +1925,12 @@ describe("adjustLayoutByDelta", () => {
         panelConstraints: [{}, { minSize: 5 }, {}, {}],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 5, 0, 75]);
   });
 
-  test("[1,2,3--,4]", () => {
+  test('[1,2,3--,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -100,
@@ -1965,12 +1955,12 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 5, 5, 85]);
   });
 
-  test("[1,2,3--,4]", () => {
+  test('[1,2,3--,4]', () => {
     expect(
       adjustLayoutByDelta({
         delta: -100,
@@ -1991,13 +1981,13 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [2, 3],
         prevLayout: [25, 25, 25, 25],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([20, 5, 20, 55]);
   });
 
-  describe("invalid layouts", () => {
-    test("should ignore changes that violate max or min size constraints", () => {
+  describe('invalid layouts', () => {
+    test('should ignore changes that violate max or min size constraints', () => {
       expect(
         adjustLayoutByDelta({
           delta: 1,
@@ -2005,7 +1995,7 @@ describe("adjustLayoutByDelta", () => {
           panelConstraints: [{ maxSize: 50 }, {}],
           pivotIndices: [0, 1],
           prevLayout: [50, 50],
-          trigger: "imperative-api",
+          trigger: 'imperative-api',
         })
       ).toEqual([50, 50]);
 
@@ -2016,14 +2006,14 @@ describe("adjustLayoutByDelta", () => {
           panelConstraints: [{}, { minSize: 50 }],
           pivotIndices: [0, 1],
           prevLayout: [50, 50],
-          trigger: "imperative-api",
+          trigger: 'imperative-api',
         })
       ).toEqual([50, 50]);
     });
   });
 
   // Edge case (issues/311)
-  test("should fallback to the previous layout if an intermediate layout is invalid", () => {
+  test('should fallback to the previous layout if an intermediate layout is invalid', () => {
     expect(
       adjustLayoutByDelta({
         delta: 1,
@@ -2036,7 +2026,7 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [5, 30, 30, 36],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 30, 30, 36]);
   });
@@ -2055,7 +2045,7 @@ describe("adjustLayoutByDelta", () => {
         ],
         pivotIndices: [0, 1],
         prevLayout: [15, 15, 30, 36],
-        trigger: "imperative-api",
+        trigger: 'imperative-api',
       })
     ).toEqual([5, 15, 40, 40]);
   });

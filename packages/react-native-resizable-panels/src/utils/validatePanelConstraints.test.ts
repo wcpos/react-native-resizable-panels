@@ -1,19 +1,19 @@
-import { describe, test } from "vitest";
-import { verifyExpectedWarnings } from "./test-utils";
-import { validatePanelConstraints } from "./validatePanelConstraints";
+import { describe, test } from 'vitest';
+import { verifyExpectedWarnings } from './test-utils';
+import { validatePanelConstraints } from './validatePanelConstraints';
 
-describe("validatePanelConstraints", () => {
-  test("should not warn if there are no validation errors", () => {
+describe('validatePanelConstraints', () => {
+  test('should not warn if there are no validation errors', () => {
     verifyExpectedWarnings(() => {
       validatePanelConstraints({
         panelConstraints: [{}],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
     });
   });
 
-  test("should warn about conflicting min/max sizes", () => {
+  test('should warn about conflicting min/max sizes', () => {
     verifyExpectedWarnings(() => {
       validatePanelConstraints({
         panelConstraints: [
@@ -23,12 +23,12 @@ describe("validatePanelConstraints", () => {
           },
         ],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
-    }, "min size (10%) should not be greater than max size (5%)");
+    }, 'min size (10%) should not be greater than max size (5%)');
   });
 
-  test("should warn about conflicting collapsed and min sizes", () => {
+  test('should warn about conflicting collapsed and min sizes', () => {
     verifyExpectedWarnings(() => {
       validatePanelConstraints({
         panelConstraints: [
@@ -38,12 +38,12 @@ describe("validatePanelConstraints", () => {
           },
         ],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
-    }, "collapsed size should not be greater than min size");
+    }, 'collapsed size should not be greater than min size');
   });
 
-  test("should warn about conflicting default and min/max sizes", () => {
+  test('should warn about conflicting default and min/max sizes', () => {
     verifyExpectedWarnings(() => {
       validatePanelConstraints({
         panelConstraints: [
@@ -53,9 +53,9 @@ describe("validatePanelConstraints", () => {
           },
         ],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
-    }, "default size should not be less than 0");
+    }, 'default size should not be less than 0');
 
     verifyExpectedWarnings(() => {
       validatePanelConstraints({
@@ -66,9 +66,9 @@ describe("validatePanelConstraints", () => {
           },
         ],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
-    }, "default size should not be less than min size");
+    }, 'default size should not be less than min size');
 
     verifyExpectedWarnings(() => {
       validatePanelConstraints({
@@ -81,7 +81,7 @@ describe("validatePanelConstraints", () => {
           },
         ],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
     });
 
@@ -96,9 +96,9 @@ describe("validatePanelConstraints", () => {
           },
         ],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
-    }, "default size should not be less than min size");
+    }, 'default size should not be less than min size');
 
     verifyExpectedWarnings(() => {
       validatePanelConstraints({
@@ -111,9 +111,9 @@ describe("validatePanelConstraints", () => {
           },
         ],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
-    }, "default size should not be less than min size");
+    }, 'default size should not be less than min size');
 
     verifyExpectedWarnings(() => {
       validatePanelConstraints({
@@ -124,9 +124,9 @@ describe("validatePanelConstraints", () => {
           },
         ],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
-    }, "default size should not be greater than 100");
+    }, 'default size should not be greater than 100');
 
     verifyExpectedWarnings(() => {
       validatePanelConstraints({
@@ -137,8 +137,8 @@ describe("validatePanelConstraints", () => {
           },
         ],
         panelIndex: 0,
-        panelId: "test",
+        panelId: 'test',
       });
-    }, "default size should not be greater than max size");
+    }, 'default size should not be greater than max size');
   });
 });

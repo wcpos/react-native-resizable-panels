@@ -26,18 +26,17 @@ export type TPanelGroupContext = {
   isPanelExpanded: (panelData: PanelData) => boolean;
   reevaluatePanelConstraints: (panelData: PanelData, prevConstraints: PanelConstraints) => void;
   registerPanel: (panelData: PanelData) => void;
+  registerHandle: (handleId: string) => [number, number];
   registerResizeHandle: (
     dragHandleId: string
   ) => (gesture: GestureUpdateEvent<PanGestureHandlerEventPayload>) => void;
   resizePanel: (panelData: PanelData, size: number) => void;
   startDragging: (
     dragHandleId: string,
-    pivotIndices: [number, number],
     event: GestureStateChangeEvent<PanGestureHandlerEventPayload>
   ) => void;
   stopDragging: () => void;
   unregisterPanel: (panelData: PanelData) => void;
 };
-export const PanelGroupContext = createContext<TPanelGroupContext | null>(null);
 
-PanelGroupContext.displayName = 'PanelGroupContext';
+export const PanelGroupContext = createContext<TPanelGroupContext | null>(null);

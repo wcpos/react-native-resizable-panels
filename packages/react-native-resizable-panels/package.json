@@ -47,11 +47,11 @@
     "react-native-web": {
       "optional": true
     },
-    "react-native-gesture-handler": { 
-      "optional": true 
+    "react-native-gesture-handler": {
+      "optional": true
     },
-    "react-native-reanimated": { 
-      "optional": true 
+    "react-native-reanimated": {
+      "optional": true
     }
   },
   "eslintConfig": {

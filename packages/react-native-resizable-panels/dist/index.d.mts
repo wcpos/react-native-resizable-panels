@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { ViewProps, StyleProp, ViewStyle } from 'react-native';
 
 type PanelOnCollapse = () => void;
@@ -45,11 +45,11 @@ type PanelProps = ViewProps & {
     order?: number;
     style?: StyleProp<ViewStyle>;
     children?: React.ReactNode;
-    panelRef?: React.Ref<ImperativePanelHandle>;
+    ref?: React.Ref<ImperativePanelHandle>;
 };
-declare function Panel({ children, collapsedSize, collapsible, defaultSize, id: idFromProps, maxSize, minSize, onCollapse, onExpand, onResize, order, style: styleFromProps, panelRef, ...viewProps }: PanelProps): React.JSX.Element;
+declare function Panel({ ref, children, collapsedSize, collapsible, defaultSize, id: idFromProps, maxSize, minSize, onCollapse, onExpand, onResize, order, style: styleFromProps, ...viewProps }: PanelProps): React.JSX.Element;
 
-type Direction = "horizontal" | "vertical";
+type Direction = 'horizontal' | 'vertical';
 
 type ImperativePanelGroupHandle = {
     getId: () => string;
@@ -62,12 +62,14 @@ interface PanelGroupStorage {
     setItem(name: string, value: string): void;
 }
 interface PanelGroupProps extends Omit<ViewProps, 'onLayout'> {
+    ref?: React.Ref<ImperativePanelGroupHandle>;
     autoSaveId?: string | null;
     direction: Direction;
     onLayout?: (layout: number[]) => void;
     style?: StyleProp<ViewStyle>;
+    children?: ReactNode;
 }
-declare function PanelGroup({ autoSaveId, children, direction, onLayout, style, ...viewProps }: PanelGroupProps, forwardedRef: React.ForwardedRef<ImperativePanelGroupHandle>): React.JSX.Element;
+declare function PanelGroup({ ref, autoSaveId, children, direction, onLayout, style, ...viewProps }: PanelGroupProps): React.JSX.Element;
 
 type PanelResizeHandleOnDragging = (isDragging: boolean) => void;
 type PanelResizeHandleProps = {
@@ -79,11 +81,6 @@ type PanelResizeHandleProps = {
     /** If true, the handle is disabled (no gestures). */
     disabled?: boolean;
     /**
-     * The two panel indices that this handle sits between.
-     * E.g. if this handle is between panels 1 and 2, pass [1, 2].
-     */
-    pivotIndices: [number, number];
-    /**
      * A callback that is called when the handle is dragged.
      */
     onDragging?: PanelResizeHandleOnDragging;
@@ -92,7 +89,7 @@ type PanelResizeHandleProps = {
  * A draggable handle between two panels. Uses React Native Gesture Handler
  * with GestureDetector + Gesture.Pan().
  */
-declare function PanelResizeHandle({ style, disabled, pivotIndices, onDragging, ...viewProps }: PanelResizeHandleProps): React.JSX.Element;
+declare function PanelResizeHandle({ style, disabled, onDragging, ...viewProps }: PanelResizeHandleProps): React.JSX.Element;
 
 declare const DATA_ATTRIBUTES: {
     readonly group: "data-panel-group";
