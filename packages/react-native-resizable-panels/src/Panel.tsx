@@ -108,6 +108,25 @@ export function Panel({
     order,
   });
 
+  const devWarningsRef = useRef<{
+    didLogMissingDefaultSizeWarning: boolean;
+  }>({
+    didLogMissingDefaultSizeWarning: false,
+  });
+
+  // Normally we wouldn't log a warning during render,
+  // but effects don't run on the server, so we can't do it there
+  if (process.env.NODE_ENV === 'development') {
+    if (!devWarningsRef.current.didLogMissingDefaultSizeWarning) {
+      if (defaultSize == null) {
+        devWarningsRef.current.didLogMissingDefaultSizeWarning = true;
+        console.warn(
+          `WARNING: Panel defaultSize prop recommended to avoid layout shift after server rendering`
+        );
+      }
+    }
+  }
+
   // Sync props→ref and re-evaluate constraints if needed
   useLayoutEffect(() => {
     const { callbacks, constraints } = panelDataRef.current;

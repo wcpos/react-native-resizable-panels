@@ -56,7 +56,7 @@ export function useWindowSplitterPanelGroupBehavior({
 
       const resizeHandleElement = resizeHandleElements[index];
       if (resizeHandleElement == null) {
-        if (__DEV__) {
+        if (process.env.NODE_ENV === 'development') {
           const { didWarnAboutMissingResizeHandle } = devWarningsRef.current;
 
           if (!didWarnAboutMissingResizeHandle) {

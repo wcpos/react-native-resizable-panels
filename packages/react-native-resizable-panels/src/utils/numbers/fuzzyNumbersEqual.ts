@@ -1,4 +1,4 @@
-import { fuzzyCompareNumbers } from "./fuzzyCompareNumbers";
+import { fuzzyCompareNumbers } from './fuzzyCompareNumbers';
 
 export function fuzzyNumbersEqual(
   actual: number,

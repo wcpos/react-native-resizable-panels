@@ -20,9 +20,13 @@ import { DragState, PanelGroupContext, TPanelGroupContext } from './PanelGroupCo
 import { Direction } from './types';
 import { adjustLayoutByDelta } from './utils/adjustLayoutByDelta';
 import { areEqual } from './utils/arrays';
+import { assert } from './utils/assert';
 import { calculateUnsafeDefaultLayout } from './utils/calculateUnsafeDefaultLayout';
 import { callPanelCallbacks } from './utils/callPanelCallbacks';
 import { compareLayouts } from './utils/compareLayouts';
+import { computePanelFlexBoxStyle } from './utils/computePanelFlexBoxStyle';
+import { fuzzyCompareNumbers } from './utils/numbers/fuzzyCompareNumbers';
+import { fuzzyNumbersEqual } from './utils/numbers/fuzzyNumbersEqual';
 import { validatePanelGroupLayout } from './utils/validatePanelGroupLayout';
 
 export type ImperativePanelGroupHandle = {
@@ -144,6 +148,57 @@ export function PanelGroup({
         callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
       }
     }
+  }, []);
+
+  const getPanelSize = useCallback((panelData: PanelData) => {
+    const { layout, panelDataArray } = eagerValuesRef.current;
+    const { panelSize } = panelDataHelper(panelDataArray, panelData, layout);
+    assert(panelSize != null, `Panel size not found for panel "${panelData.id}"`);
+    return panelSize;
+  }, []);
+
+  const getPanelStyle = useCallback(
+    (panelData: PanelData, defaultSize: number | undefined): StyleProp<ViewStyle> => {
+      const { layout: arr, panelDataArray } = eagerValuesRef.current;
+      const panelIndex = findPanelDataIndex(panelDataArray, panelData);
+
+      return computePanelFlexBoxStyle({
+        defaultSize,
+        dragState,
+        layout: arr,
+        panelData: panelDataArray,
+        panelIndex,
+      });
+    },
+    [dragState, layout]
+  );
+
+  const isPanelCollapsed = useCallback((panelData: PanelData) => {
+    const { layout, panelDataArray } = eagerValuesRef.current;
+
+    const {
+      collapsedSize = 0,
+      collapsible,
+      panelSize,
+    } = panelDataHelper(panelDataArray, panelData, layout);
+
+    assert(panelSize != null, `Panel size not found for panel "${panelData.id}"`);
+
+    return collapsible === true && fuzzyNumbersEqual(panelSize, collapsedSize);
+  }, []);
+
+  const isPanelExpanded = useCallback((panelData: PanelData) => {
+    const { layout, panelDataArray } = eagerValuesRef.current;
+
+    const {
+      collapsedSize = 0,
+      collapsible,
+      panelSize,
+    } = panelDataHelper(panelDataArray, panelData, layout);
+
+    assert(panelSize != null, `Panel size not found for panel "${panelData.id}"`);
+
+    return !collapsible || fuzzyCompareNumbers(panelSize, collapsedSize) > 0;
   }, []);
 
   const registerPanel = useCallback((panelData: PanelData) => {
@@ -383,36 +438,11 @@ export function PanelGroup({
       direction,
       dragState,
       expandPanel,
-      getPanelSize: (pd) => {
-        const { layout: arr, panelDataArray } = eagerValuesRef.current;
-        const idx = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
-        return arr[idx];
-      },
-      getPanelStyle: (pd, defaultSize): StyleProp<ViewStyle> => {
-        const { layout: arr, panelDataArray } = eagerValuesRef.current;
-        const index = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
-        const sizePct = arr[index];
-        return {
-          flexBasis: `${sizePct}%`,
-          flexGrow: 0,
-          flexShrink: 0,
-        };
-      },
+      getPanelSize,
+      getPanelStyle,
       groupId,
-      isPanelCollapsed: (pd) => {
-        const { layout: arr, panelDataArray } = eagerValuesRef.current;
-        const idx = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
-        const { collapsedSize = 0, collapsible } = pd.constraints;
-        const panelSize = arr[idx];
-        return collapsible === true && panelSize === collapsedSize;
-      },
-      isPanelExpanded: (pd) => {
-        const { layout: arr, panelDataArray } = eagerValuesRef.current;
-        const idx = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
-        const { collapsible, collapsedSize = 0 } = pd.constraints;
-        const panelSize = arr[idx];
-        return !collapsible || panelSize > collapsedSize;
-      },
+      isPanelCollapsed,
+      isPanelExpanded,
       reevaluatePanelConstraints,
       registerPanel,
       registerHandle,
@@ -426,6 +456,11 @@ export function PanelGroup({
       collapsePanel,
       direction,
       expandPanel,
+      getPanelSize,
+      getPanelStyle,
+      groupId,
+      isPanelCollapsed,
+      isPanelExpanded,
       reevaluatePanelConstraints,
       registerPanel,
       registerHandle,

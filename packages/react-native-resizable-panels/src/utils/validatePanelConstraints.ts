@@ -10,7 +10,7 @@ export function validatePanelConstraints({
   panelId: string | undefined;
   panelIndex: number;
 }): boolean {
-  if (__DEV__) {
+  if (process.env.NODE_ENV === 'development') {
     const warnings = [];
 
     const panelConstraints = panelConstraintsArray[panelIndex];

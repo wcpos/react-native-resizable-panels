@@ -73,6 +73,19 @@ function Panel({
     idIsFromProps: idFromProps !== void 0,
     order
   });
+  const devWarningsRef = useRef2({
+    didLogMissingDefaultSizeWarning: false
+  });
+  if (process.env.NODE_ENV === "development") {
+    if (!devWarningsRef.current.didLogMissingDefaultSizeWarning) {
+      if (defaultSize == null) {
+        devWarningsRef.current.didLogMissingDefaultSizeWarning = true;
+        console.warn(
+          `WARNING: Panel defaultSize prop recommended to avoid layout shift after server rendering`
+        );
+      }
+    }
+  }
   useLayoutEffect(() => {
     const { callbacks, constraints } = panelDataRef.current;
     const prevConstraints = { ...constraints };
@@ -476,6 +489,34 @@ function compareLayouts(a, b) {
   return true;
 }
 
+// src/utils/computePanelFlexBoxStyle.ts
+function computePanelFlexBoxStyle(args) {
+  const { defaultSize, layout, dragState, panelData, panelIndex, precision = 3 } = args;
+  const size = layout[panelIndex];
+  let flexGrowValue;
+  if (size == null) {
+    if (defaultSize != null) {
+      flexGrowValue = Number(defaultSize.toPrecision(precision));
+    } else {
+      flexGrowValue = 1;
+    }
+  } else if (panelData.length === 1) {
+    flexGrowValue = 1;
+  } else {
+    flexGrowValue = Number(size.toPrecision(precision));
+  }
+  return {
+    flexBasis: 0,
+    flexGrow: flexGrowValue,
+    flexShrink: 1,
+    // Prevent child content from overflowing its panel
+    overflow: "hidden",
+    // Disable pointer events inside this panel while dragging (so that e.g. touches
+    // on nested elements don’t interfere mid-drag).
+    pointerEvents: dragState !== null ? "none" : "auto"
+  };
+}
+
 // src/utils/validatePanelGroupLayout.ts
 function validatePanelGroupLayout({
   layout: prevLayout,
@@ -488,7 +529,7 @@ function validatePanelGroupLayout({
       `Invalid ${panelConstraints.length} panel layout: ${nextLayout.map((size) => `${size}%`).join(", ")}`
     );
   } else if (!fuzzyNumbersEqual2(nextLayoutTotalSize, 100) && nextLayout.length > 0) {
-    if (__DEV__) {
+    if (process.env.NODE_ENV === "development") {
       console.warn(
         `WARNING: Invalid layout total size: ${nextLayout.map((size) => `${size}%`).join(", ")}. Layout normalization will be applied.`
       );
@@ -614,6 +655,46 @@ function PanelGroup({
         callPanelCallbacks(panelDataArray, nextLayout, panelIdToLastNotifiedSizeMapRef.current);
       }
     }
+  }, []);
+  const getPanelSize = useCallback((panelData) => {
+    const { layout: layout2, panelDataArray } = eagerValuesRef.current;
+    const { panelSize } = panelDataHelper(panelDataArray, panelData, layout2);
+    assert(panelSize != null, `Panel size not found for panel "${panelData.id}"`);
+    return panelSize;
+  }, []);
+  const getPanelStyle = useCallback(
+    (panelData, defaultSize) => {
+      const { layout: arr, panelDataArray } = eagerValuesRef.current;
+      const panelIndex = findPanelDataIndex(panelDataArray, panelData);
+      return computePanelFlexBoxStyle({
+        defaultSize,
+        dragState,
+        layout: arr,
+        panelData: panelDataArray,
+        panelIndex
+      });
+    },
+    [dragState, layout]
+  );
+  const isPanelCollapsed = useCallback((panelData) => {
+    const { layout: layout2, panelDataArray } = eagerValuesRef.current;
+    const {
+      collapsedSize = 0,
+      collapsible,
+      panelSize
+    } = panelDataHelper(panelDataArray, panelData, layout2);
+    assert(panelSize != null, `Panel size not found for panel "${panelData.id}"`);
+    return collapsible === true && fuzzyNumbersEqual2(panelSize, collapsedSize);
+  }, []);
+  const isPanelExpanded = useCallback((panelData) => {
+    const { layout: layout2, panelDataArray } = eagerValuesRef.current;
+    const {
+      collapsedSize = 0,
+      collapsible,
+      panelSize
+    } = panelDataHelper(panelDataArray, panelData, layout2);
+    assert(panelSize != null, `Panel size not found for panel "${panelData.id}"`);
+    return !collapsible || fuzzyCompareNumbers(panelSize, collapsedSize) > 0;
   }, []);
   const registerPanel = useCallback((panelData) => {
     const arr = eagerValuesRef.current.panelDataArray;
@@ -821,36 +902,11 @@ function PanelGroup({
       direction,
       dragState,
       expandPanel,
-      getPanelSize: (pd) => {
-        const { layout: arr, panelDataArray } = eagerValuesRef.current;
-        const idx = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
-        return arr[idx];
-      },
-      getPanelStyle: (pd, defaultSize) => {
-        const { layout: arr, panelDataArray } = eagerValuesRef.current;
-        const index = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
-        const sizePct = arr[index];
-        return {
-          flexBasis: `${sizePct}%`,
-          flexGrow: 0,
-          flexShrink: 0
-        };
-      },
+      getPanelSize,
+      getPanelStyle,
       groupId,
-      isPanelCollapsed: (pd) => {
-        const { layout: arr, panelDataArray } = eagerValuesRef.current;
-        const idx = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
-        const { collapsedSize = 0, collapsible } = pd.constraints;
-        const panelSize = arr[idx];
-        return collapsible === true && panelSize === collapsedSize;
-      },
-      isPanelExpanded: (pd) => {
-        const { layout: arr, panelDataArray } = eagerValuesRef.current;
-        const idx = panelDataArray.findIndex((p) => p === pd || p.id === pd.id);
-        const { collapsible, collapsedSize = 0 } = pd.constraints;
-        const panelSize = arr[idx];
-        return !collapsible || panelSize > collapsedSize;
-      },
+      isPanelCollapsed,
+      isPanelExpanded,
       reevaluatePanelConstraints,
       registerPanel,
       registerHandle,
@@ -864,6 +920,11 @@ function PanelGroup({
       collapsePanel,
       direction,
       expandPanel,
+      getPanelSize,
+      getPanelStyle,
+      groupId,
+      isPanelCollapsed,
+      isPanelExpanded,
       reevaluatePanelConstraints,
       registerPanel,
       registerHandle,
