@@ -1,10 +1,5 @@
 import { createContext } from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
-import {
-  GestureStateChangeEvent,
-  GestureUpdateEvent,
-  PanGestureHandlerEventPayload,
-} from 'react-native-gesture-handler';
+import { SharedValue } from 'react-native-reanimated';
 import { PanelConstraints, PanelData } from './Panel';
 
 export type DragState = {
@@ -17,26 +12,23 @@ export type DragState = {
 export type TPanelGroupContext = {
   collapsePanel: (panelData: PanelData) => void;
   direction: 'horizontal' | 'vertical';
-  dragState: DragState | null;
+  dragState: SharedValue<DragState | null>;
   expandPanel: (panelData: PanelData, minSizeOverride?: number) => void;
   getPanelSize: (panelData: PanelData) => number;
-  getPanelStyle: (panelData: PanelData, defaultSize: number | undefined) => StyleProp<ViewStyle>;
+  getPanelIndex: (panelData: PanelData) => number;
   groupId: string;
   isPanelCollapsed: (panelData: PanelData) => boolean;
   isPanelExpanded: (panelData: PanelData) => boolean;
   reevaluatePanelConstraints: (panelData: PanelData, prevConstraints: PanelConstraints) => void;
   registerPanel: (panelData: PanelData) => void;
   registerHandle: (handleId: string) => [number, number];
-  registerResizeHandle: (
-    dragHandleId: string
-  ) => (gesture: GestureUpdateEvent<PanGestureHandlerEventPayload>) => void;
+  registerResizeHandle: () => (translationX: number, translationY: number) => void;
   resizePanel: (panelData: PanelData, size: number) => void;
-  startDragging: (
-    dragHandleId: string,
-    event: GestureStateChangeEvent<PanGestureHandlerEventPayload>
-  ) => void;
+  startDragging: (dragHandleId: string) => void;
   stopDragging: () => void;
   unregisterPanel: (panelData: PanelData) => void;
+  layoutShared: SharedValue<number[]>;
+  panelIdsShared: SharedValue<string[]>;
 };
 
 export const PanelGroupContext = createContext<TPanelGroupContext | null>(null);

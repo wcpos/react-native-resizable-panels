@@ -1,4 +1,4 @@
-import { isHTMLElement } from "./isHTMLElement";
+import { isHTMLElement } from './isHTMLElement';
 
 export function getPanelGroupElement(
   id: string,
@@ -10,9 +10,7 @@ export function getPanelGroupElement(
   }
 
   // Else query children
-  const element = rootElement.querySelector(
-    `[data-panel-group][data-panel-group-id="${id}"]`
-  );
+  const element = rootElement.querySelector(`[data-panel-group][data-panel-group-id="${id}"]`);
   if (element) {
     return element as HTMLElement;
   }

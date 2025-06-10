@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { runOnJS } from 'react-native-reanimated';
 
 import { PanelGroupContext } from './PanelGroupContext';
 
@@ -51,20 +52,24 @@ export function PanelResizeHandle({
   // Create a Pan gesture. onBegin triggers startDragging,
   // onUpdate runs the resize handler, onEnd calls stopDragging.
   const panGesture = Gesture.Pan()
-    .onBegin((e) => {
+    .onBegin(() => {
       if (disabled) return;
-      onDragging?.(true);
-      startDragging(handleIdRef.current, e);
+      if (onDragging) {
+        runOnJS(onDragging)(true);
+      }
+      runOnJS(startDragging)(handleIdRef.current);
     })
-    .onChange((e) => {
+    .onUpdate((e) => {
       if (disabled) return;
       const resizeHandler = registerResizeHandle(handleIdRef.current);
       resizeHandler(e);
     })
     .onEnd(() => {
       if (disabled) return;
-      onDragging?.(false);
-      stopDragging();
+      if (onDragging) {
+        runOnJS(onDragging)(false);
+      }
+      runOnJS(stopDragging)();
     });
 
   /**

@@ -1,4 +1,4 @@
-import { PanelGroupStorage } from "../PanelGroup";
+import { PanelGroupStorage } from '../PanelGroup';
 
 // PanelGroup might be rendering in a server-side environment where localStorage is not available
 // or on a browser with cookies/storage disabled.
@@ -6,7 +6,7 @@ import { PanelGroupStorage } from "../PanelGroup";
 // and avoids throwing user-visible errors.
 export function initializeDefaultStorage(storageObject: PanelGroupStorage) {
   try {
-    if (typeof localStorage !== "undefined") {
+    if (typeof localStorage !== 'undefined') {
       // Bypass this check for future calls
       storageObject.getItem = (name: string) => {
         return localStorage.getItem(name);
@@ -15,7 +15,7 @@ export function initializeDefaultStorage(storageObject: PanelGroupStorage) {
         localStorage.setItem(name, value);
       };
     } else {
-      throw new Error("localStorage not supported in this environment");
+      throw new Error('localStorage not supported in this environment');
     }
   } catch (error) {
     console.error(error);

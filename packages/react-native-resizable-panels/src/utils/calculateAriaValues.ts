@@ -1,5 +1,5 @@
-import { PanelData } from "../Panel";
-import { assert } from "./assert";
+import { PanelData } from '../Panel';
+import { assert } from './assert';
 
 export function calculateAriaValues({
   layout,
@@ -16,7 +16,7 @@ export function calculateAriaValues({
   let totalMaxSize = 0;
 
   const firstIndex = pivotIndices[0];
-  assert(firstIndex != null, "No pivot index found");
+  assert(firstIndex != null, 'No pivot index found');
 
   // A panel's effective min/max sizes also need to account for other panel's sizes.
   panelsArray.forEach((panelData, index) => {

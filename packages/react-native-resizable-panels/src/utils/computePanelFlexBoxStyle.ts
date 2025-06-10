@@ -12,6 +12,7 @@ export function computePanelFlexBoxStyle(args: {
   /** How many significant digits to keep when converting number→string. */
   precision?: number;
 }): ViewStyle {
+  console.log('computePanelFlexBoxStyle', args);
   const { defaultSize, layout, dragState, panelData, panelIndex, precision = 3 } = args;
 
   // “size” will be undefined on the very first render (before layout is computed).

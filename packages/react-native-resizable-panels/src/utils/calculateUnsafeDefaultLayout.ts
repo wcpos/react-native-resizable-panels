@@ -1,5 +1,5 @@
-import { PanelData } from "../Panel";
-import { assert } from "./assert";
+import { PanelData } from '../Panel';
+import { assert } from './assert';
 
 export function calculateUnsafeDefaultLayout({
   panelDataArray,
@@ -8,9 +8,7 @@ export function calculateUnsafeDefaultLayout({
 }): number[] {
   const layout = Array<number>(panelDataArray.length);
 
-  const panelConstraintsArray = panelDataArray.map(
-    (panelData) => panelData.constraints
-  );
+  const panelConstraintsArray = panelDataArray.map((panelData) => panelData.constraints);
 
   let numPanelsWithSizes = 0;
   let remainingSize = 100;
@@ -28,7 +26,11 @@ export function calculateUnsafeDefaultLayout({
     }
   }
 
-  // Remaining size should be distributed evenly between panels without default sizes
+  // Calculate the size for remaining panels once, before the loop.
+  const numRemainingPanels = panelDataArray.length - numPanelsWithSizes;
+  const sizePerRemainingPanel = numRemainingPanels > 0 ? remainingSize / numRemainingPanels : 0;
+
+  // Distribute the remaining size evenly.
   for (let index = 0; index < panelDataArray.length; index++) {
     const panelConstraints = panelConstraintsArray[index];
     assert(panelConstraints, `Panel constraints not found for index ${index}`);
@@ -38,12 +40,7 @@ export function calculateUnsafeDefaultLayout({
       continue;
     }
 
-    const numRemainingPanels = panelDataArray.length - numPanelsWithSizes;
-    const size = remainingSize / numRemainingPanels;
-
-    numPanelsWithSizes++;
-    layout[index] = size;
-    remainingSize -= size;
+    layout[index] = sizePerRemainingPanel;
   }
 
   return layout;

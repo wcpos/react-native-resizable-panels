@@ -1,5 +1,5 @@
-import { DATA_ATTRIBUTES } from "../../constants";
-import { getResizeHandleElementsForGroup } from "./getResizeHandleElementsForGroup";
+import { DATA_ATTRIBUTES } from '../../constants';
+import { getResizeHandleElementsForGroup } from './getResizeHandleElementsForGroup';
 
 export function getResizeHandleElementIndex(
   groupId: string,

@@ -1,7 +1,7 @@
-import { DragState, ResizeEvent } from "../PanelGroupContext";
-import { Direction } from "../types";
-import { calculateDragOffsetPercentage } from "./calculateDragOffsetPercentage";
-import { isKeyDown } from "./events";
+import { DragState, ResizeEvent } from '../PanelGroupContext';
+import { Direction } from '../types';
+import { calculateDragOffsetPercentage } from './calculateDragOffsetPercentage';
+import { isKeyDown } from './events';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/movementX
 export function calculateDeltaPercentage(
@@ -13,7 +13,7 @@ export function calculateDeltaPercentage(
   panelGroupElement: HTMLElement
 ): number {
   if (isKeyDown(event)) {
-    const isHorizontal = direction === "horizontal";
+    const isHorizontal = direction === 'horizontal';
 
     let delta = 0;
     if (event.shiftKey) {
@@ -26,22 +26,22 @@ export function calculateDeltaPercentage(
 
     let movement = 0;
     switch (event.key) {
-      case "ArrowDown":
+      case 'ArrowDown':
         movement = isHorizontal ? 0 : delta;
         break;
-      case "ArrowLeft":
+      case 'ArrowLeft':
         movement = isHorizontal ? -delta : 0;
         break;
-      case "ArrowRight":
+      case 'ArrowRight':
         movement = isHorizontal ? delta : 0;
         break;
-      case "ArrowUp":
+      case 'ArrowUp':
         movement = isHorizontal ? 0 : -delta;
         break;
-      case "End":
+      case 'End':
         movement = 100;
         break;
-      case "Home":
+      case 'Home':
         movement = -100;
         break;
     }

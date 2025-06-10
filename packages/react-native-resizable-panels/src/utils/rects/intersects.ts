@@ -1,10 +1,6 @@
-import { Rectangle } from "./types";
+import { Rectangle } from './types';
 
-export function intersects(
-  rectOne: Rectangle,
-  rectTwo: Rectangle,
-  strict: boolean
-): boolean {
+export function intersects(rectOne: Rectangle, rectTwo: Rectangle, strict: boolean): boolean {
   if (strict) {
     return (
       rectOne.x < rectTwo.x + rectTwo.width &&

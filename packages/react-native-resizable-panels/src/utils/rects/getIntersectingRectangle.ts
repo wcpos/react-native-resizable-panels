@@ -1,5 +1,5 @@
-import { intersects } from "./intersects";
-import { Rectangle } from "./types";
+import { intersects } from './intersects';
+import { Rectangle } from './types';
 
 export function getIntersectingRectangle(
   rectOne: Rectangle,

@@ -1,7 +1,7 @@
-import { PanelConstraints } from "../Panel";
-import { PRECISION } from "../constants";
-import { assert } from "./assert";
-import { fuzzyCompareNumbers } from "./numbers/fuzzyCompareNumbers";
+import { PanelConstraints } from '../Panel';
+import { PRECISION } from '../constants';
+import { assert } from './assert';
+import { fuzzyCompareNumbers } from './numbers/fuzzyCompareNumbers';
 
 // Panel size must be in percentages; pixel values should be pre-converted
 export function resizePanel({
@@ -14,17 +14,9 @@ export function resizePanel({
   size: number;
 }) {
   const panelConstraints = panelConstraintsArray[panelIndex];
-  assert(
-    panelConstraints != null,
-    `Panel constraints not found for index ${panelIndex}`
-  );
+  assert(panelConstraints != null, `Panel constraints not found for index ${panelIndex}`);
 
-  let {
-    collapsedSize = 0,
-    collapsible,
-    maxSize = 100,
-    minSize = 0,
-  } = panelConstraints;
+  let { collapsedSize = 0, collapsible, maxSize = 100, minSize = 0 } = panelConstraints;
 
   if (fuzzyCompareNumbers(size, minSize) < 0) {
     if (collapsible) {

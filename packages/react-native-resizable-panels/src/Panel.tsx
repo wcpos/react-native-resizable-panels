@@ -1,5 +1,10 @@
 import React, { useContext, useImperativeHandle, useLayoutEffect, useRef } from 'react';
-import { StyleProp, View, ViewProps, ViewStyle } from 'react-native';
+import { StyleProp, ViewProps, ViewStyle } from 'react-native';
+import Animated, {
+  useAnimatedProps,
+  useAnimatedStyle,
+  useDerivedValue,
+} from 'react-native-reanimated';
 import useUniqueId from './hooks/useUniqueId';
 import { PanelGroupContext } from './PanelGroupContext';
 
@@ -80,12 +85,14 @@ export function Panel({
     collapsePanel,
     expandPanel,
     getPanelSize,
-    getPanelStyle,
     isPanelCollapsed,
     reevaluatePanelConstraints,
     registerPanel,
-    resizePanel,
     unregisterPanel,
+    resizePanel,
+    layoutShared,
+    panelIdsShared,
+    dragState,
   } = context;
 
   const panelId = useUniqueId(idFromProps);
@@ -194,12 +201,81 @@ export function Panel({
     [collapsePanel, expandPanel, getPanelSize, isPanelCollapsed, panelId, resizePanel]
   );
 
-  // Compute RN style for this panel
-  const panelStyle = getPanelStyle(panelDataRef.current, defaultSize) as ViewStyle;
+  const animatedStyle = useAnimatedStyle(() => {
+    // 'worklet';
+
+    // Access all shared values unconditionally at the top.
+    const layout = layoutShared.value;
+    const panelIds = panelIdsShared.value;
+    const currentDragState = dragState.value;
+
+    const panelIndex = panelIds.indexOf(panelId);
+
+    console.log(
+      `[UI] Style calculation for panelId "${panelId}". Searching in [${panelIds.join(', ')}]. Found index: ${panelIndex}`
+    );
+
+    const size = panelIndex > -1 ? layout[panelIndex] : undefined;
+
+    let flexGrowValue: number;
+    const precision = 3;
+
+    if (size == null) {
+      if (defaultSize != null) {
+        flexGrowValue = Number(defaultSize.toPrecision(precision));
+      } else {
+        flexGrowValue = 1;
+      }
+    } else if (panelIds.length === 1) {
+      flexGrowValue = 1;
+    } else {
+      flexGrowValue = Number(size.toPrecision(precision));
+    }
+
+    return {
+      flexBasis: 0,
+      flexGrow: flexGrowValue,
+      flexShrink: 1,
+      overflow: 'hidden',
+      pointerEvents: currentDragState !== null ? 'none' : 'auto',
+    };
+  }, [panelId, defaultSize]);
+
+  const debugText = useDerivedValue(() => {
+    // 'worklet';
+    const layout = layoutShared.value;
+    const panelIds = panelIdsShared.value;
+    const panelIndex = panelIds.indexOf(panelId);
+    const size = panelIndex > -1 ? layout[panelIndex] : 'N/A';
+
+    return `Panel ID: ${panelId.substring(0, 5)}\nIndex: ${panelIndex}\nSize: ${
+      typeof size === 'number' ? size.toFixed(1) : size
+    }`;
+  });
+
+  const animatedDebugProps = useAnimatedProps(() => {
+    return {
+      children: debugText.value,
+    };
+  });
 
   return (
-    <View {...viewProps} style={[panelStyle, styleFromProps]}>
+    <Animated.View {...viewProps} style={[animatedStyle, styleFromProps]}>
       {children}
-    </View>
+      <Animated.Text
+        style={{
+          position: 'absolute',
+          top: 10,
+          left: 10,
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          color: 'white',
+          padding: 4,
+          fontSize: 10,
+          borderRadius: 4,
+          zIndex: 100,
+        }}
+        animatedProps={animatedDebugProps}
+      />
+    </Animated.View>
   );
 }

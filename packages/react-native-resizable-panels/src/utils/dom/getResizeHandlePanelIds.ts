@@ -1,6 +1,6 @@
-import { PanelData } from "../../Panel";
-import { getResizeHandleElement } from "./getResizeHandleElement";
-import { getResizeHandleElementsForGroup } from "./getResizeHandleElementsForGroup";
+import { PanelData } from '../../Panel';
+import { getResizeHandleElement } from './getResizeHandleElement';
+import { getResizeHandleElementsForGroup } from './getResizeHandleElementsForGroup';
 
 export function getResizeHandlePanelIds(
   groupId: string,

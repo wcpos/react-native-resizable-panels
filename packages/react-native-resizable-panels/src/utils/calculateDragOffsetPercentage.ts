@@ -1,10 +1,10 @@
-import { DATA_ATTRIBUTES } from "..";
-import { DragState, ResizeEvent } from "../PanelGroupContext";
-import { Direction } from "../types";
-import { assert } from "./assert";
-import { getPanelGroupElement } from "./dom/getPanelGroupElement";
-import { getResizeHandleElement } from "./dom/getResizeHandleElement";
-import { getResizeEventCursorPosition } from "./events/getResizeEventCursorPosition";
+import { DATA_ATTRIBUTES } from '..';
+import { DragState, ResizeEvent } from '../PanelGroupContext';
+import { Direction } from '../types';
+import { assert } from './assert';
+import { getPanelGroupElement } from './dom/getPanelGroupElement';
+import { getResizeHandleElement } from './dom/getResizeHandleElement';
+import { getResizeEventCursorPosition } from './events/getResizeEventCursorPosition';
 
 export function calculateDragOffsetPercentage(
   event: ResizeEvent,
@@ -13,13 +13,10 @@ export function calculateDragOffsetPercentage(
   initialDragState: DragState,
   panelGroupElement: HTMLElement
 ): number {
-  const isHorizontal = direction === "horizontal";
+  const isHorizontal = direction === 'horizontal';
 
   const handleElement = getResizeHandleElement(dragHandleId, panelGroupElement);
-  assert(
-    handleElement,
-    `No resize handle element found for id "${dragHandleId}"`
-  );
+  assert(handleElement, `No resize handle element found for id "${dragHandleId}"`);
 
   const groupId = handleElement.getAttribute(DATA_ATTRIBUTES.groupId);
   assert(groupId, `Resize handle element has no group id attribute`);

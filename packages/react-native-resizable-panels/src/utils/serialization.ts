@@ -1,5 +1,5 @@
-import { PanelData } from "../Panel";
-import { PanelGroupStorage } from "../PanelGroup";
+import { PanelData } from '../Panel';
+import { PanelGroupStorage } from '../PanelGroup';
 
 export type PanelConfigurationState = {
   expandToSizes: {
@@ -27,13 +27,11 @@ function getPanelKey(panels: PanelData[]): string {
       if (idIsFromProps) {
         return id;
       } else {
-        return order
-          ? `${order}:${JSON.stringify(constraints)}`
-          : JSON.stringify(constraints);
+        return order ? `${order}:${JSON.stringify(constraints)}` : JSON.stringify(constraints);
       }
     })
     .sort((a, b) => a.localeCompare(b))
-    .join(",");
+    .join(',');
 }
 
 function loadSerializedPanelGroupState(
@@ -45,7 +43,7 @@ function loadSerializedPanelGroupState(
     const serialized = storage.getItem(panelGroupKey);
     if (serialized) {
       const parsed = JSON.parse(serialized);
-      if (typeof parsed === "object" && parsed != null) {
+      if (typeof parsed === 'object' && parsed != null) {
         return parsed as SerializedPanelGroupState;
       }
     }

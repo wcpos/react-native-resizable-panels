@@ -1,10 +1,10 @@
-import { DATA_ATTRIBUTES } from "..";
-import { ResizeHandler } from "../types";
-import { assert } from "../utils/assert";
-import { getResizeHandleElement } from "../utils/dom/getResizeHandleElement";
-import { getResizeHandleElementIndex } from "../utils/dom/getResizeHandleElementIndex";
-import { getResizeHandleElementsForGroup } from "../utils/dom/getResizeHandleElementsForGroup";
-import { useEffect } from "react";
+import { useEffect } from 'react';
+import { DATA_ATTRIBUTES } from '..';
+import { ResizeHandler } from '../types';
+import { assert } from '../utils/assert';
+import { getResizeHandleElement } from '../utils/dom/getResizeHandleElement';
+import { getResizeHandleElementIndex } from '../utils/dom/getResizeHandleElementIndex';
+import { getResizeHandleElementsForGroup } from '../utils/dom/getResizeHandleElementsForGroup';
 
 // https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
 
@@ -35,37 +35,27 @@ export function useWindowSplitterResizeHandlerBehavior({
       }
 
       switch (event.key) {
-        case "ArrowDown":
-        case "ArrowLeft":
-        case "ArrowRight":
-        case "ArrowUp":
-        case "End":
-        case "Home": {
+        case 'ArrowDown':
+        case 'ArrowLeft':
+        case 'ArrowRight':
+        case 'ArrowUp':
+        case 'End':
+        case 'Home': {
           event.preventDefault();
 
           resizeHandler(event);
           break;
         }
-        case "F6": {
+        case 'F6': {
           event.preventDefault();
 
           const groupId = handleElement.getAttribute(DATA_ATTRIBUTES.groupId);
           assert(groupId, `No group element found for id "${groupId}"`);
 
-          const handles = getResizeHandleElementsForGroup(
-            groupId,
-            panelGroupElement
-          );
-          const index = getResizeHandleElementIndex(
-            groupId,
-            handleId,
-            panelGroupElement
-          );
+          const handles = getResizeHandleElementsForGroup(groupId, panelGroupElement);
+          const index = getResizeHandleElementIndex(groupId, handleId, panelGroupElement);
 
-          assert(
-            index !== null,
-            `No resize element found for id "${handleId}"`
-          );
+          assert(index !== null, `No resize element found for id "${handleId}"`);
 
           const nextIndex = event.shiftKey
             ? index > 0
@@ -83,9 +73,9 @@ export function useWindowSplitterResizeHandlerBehavior({
       }
     };
 
-    handleElement.addEventListener("keydown", onKeyDown);
+    handleElement.addEventListener('keydown', onKeyDown);
     return () => {
-      handleElement.removeEventListener("keydown", onKeyDown);
+      handleElement.removeEventListener('keydown', onKeyDown);
     };
   }, [panelGroupElement, disabled, handleId, resizeHandler]);
 }

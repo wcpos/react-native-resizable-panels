@@ -1,22 +1,27 @@
-import * as React from "react";
-import { useRef } from "react";
+import { useId, useRef } from 'react';
 
-const useId = (React as any)["useId".toString()] as (() => string) | undefined;
+// A simple counter for environments that don't have React's useId.
+let idCounter = 0;
 
-const wrappedUseId: () => string | null =
-  typeof useId === "function" ? useId : (): null => null;
+/**
+ * Generates a unique and stable ID.
+ * If a `providedId` is given, it will be used.
+ * Otherwise, it leverages React's built-in `useId` hook.
+ * As a fallback for older React versions, it uses a ref-based incrementing counter.
+ */
+export default function useUniqueId(providedId?: string | null): string {
+  const idFromHook = useId();
 
-let counter = 0;
+  // Keep a ref to the ID to ensure it's stable across re-renders.
+  // This is especially important for the fallback case.
+  const stableIdRef = useRef<string | null>(null);
 
-export default function useUniqueId(
-  idFromParams: string | null = null
-): string {
-  const idFromUseId = wrappedUseId();
-
-  const idRef = useRef<string | null>(idFromParams || idFromUseId || null);
-  if (idRef.current === null) {
-    idRef.current = "" + counter++;
+  if (stableIdRef.current === null) {
+    // If an ID is provided, use it. Otherwise, use the one from the hook,
+    // or fall back to the counter.
+    stableIdRef.current = providedId || idFromHook || `panel-${idCounter++}`;
   }
 
-  return idFromParams ?? idRef.current;
+  // Always return the providedId if it exists, otherwise return the stable, generated ID.
+  return providedId || stableIdRef.current;
 }

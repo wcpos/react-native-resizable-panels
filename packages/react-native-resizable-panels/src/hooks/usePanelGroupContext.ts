@@ -1,5 +1,5 @@
-import { useContext } from "react";
-import { PanelGroupContext } from "../PanelGroupContext";
+import { useContext } from 'react';
+import { PanelGroupContext } from '../PanelGroupContext';
 
 export function usePanelGroupContext() {
   const context = useContext(PanelGroupContext);
