@@ -1,10 +1,6 @@
 import React, { useContext, useImperativeHandle, useLayoutEffect, useRef } from 'react';
 import { StyleProp, ViewProps, ViewStyle } from 'react-native';
-import Animated, {
-  useAnimatedProps,
-  useAnimatedStyle,
-  useDerivedValue,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import useUniqueId from './hooks/useUniqueId';
 import { PanelGroupContext } from './PanelGroupContext';
 
@@ -202,18 +198,11 @@ export function Panel({
   );
 
   const animatedStyle = useAnimatedStyle(() => {
-    // 'worklet';
-
-    // Access all shared values unconditionally at the top.
     const layout = layoutShared.value;
     const panelIds = panelIdsShared.value;
     const currentDragState = dragState.value;
 
     const panelIndex = panelIds.indexOf(panelId);
-
-    console.log(
-      `[UI] Style calculation for panelId "${panelId}". Searching in [${panelIds.join(', ')}]. Found index: ${panelIndex}`
-    );
 
     const size = panelIndex > -1 ? layout[panelIndex] : undefined;
 
@@ -241,41 +230,9 @@ export function Panel({
     };
   }, [panelId, defaultSize]);
 
-  const debugText = useDerivedValue(() => {
-    // 'worklet';
-    const layout = layoutShared.value;
-    const panelIds = panelIdsShared.value;
-    const panelIndex = panelIds.indexOf(panelId);
-    const size = panelIndex > -1 ? layout[panelIndex] : 'N/A';
-
-    return `Panel ID: ${panelId.substring(0, 5)}\nIndex: ${panelIndex}\nSize: ${
-      typeof size === 'number' ? size.toFixed(1) : size
-    }`;
-  });
-
-  const animatedDebugProps = useAnimatedProps(() => {
-    return {
-      children: debugText.value,
-    };
-  });
-
   return (
     <Animated.View {...viewProps} style={[animatedStyle, styleFromProps]}>
       {children}
-      <Animated.Text
-        style={{
-          position: 'absolute',
-          top: 10,
-          left: 10,
-          backgroundColor: 'rgba(0,0,0,0.7)',
-          color: 'white',
-          padding: 4,
-          fontSize: 10,
-          borderRadius: 4,
-          zIndex: 100,
-        }}
-        animatedProps={animatedDebugProps}
-      />
     </Animated.View>
   );
 }

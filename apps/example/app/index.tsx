@@ -1,36 +1,60 @@
-import { Text, View } from 'react-native';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-native-resizable-panels';
+import { Link } from 'expo-router';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+
+const links = [
+  { href: '/horizontal-layouts', name: 'Horizontal layouts' },
+  { href: '/vertical-layouts', name: 'Vertical layouts' },
+  { href: '/nested-groups', name: 'Nested groups' },
+  { href: '/persistent-layouts', name: 'Persistent layouts' },
+  { href: '/overflow-content', name: 'Overflow content' },
+  { href: '/collapsible-panels', name: 'Collapsible panels' },
+  { href: '/conditional-panels', name: 'Conditional panels' },
+  { href: '/external-persistence', name: 'External persistence' },
+  { href: '/imperative-panel-api', name: 'Imperative Panel API' },
+  { href: '/imperative-panelgroup-api', name: 'Imperative PanelGroup API' },
+];
 
 export default function IndexScreen() {
   return (
-    <PanelGroup autoSaveId="vert" direction="vertical">
-      <Panel>
-        <PanelGroup autoSaveId="horz" direction="horizontal">
-          <Panel defaultSize={25}>
-            <View style={{ backgroundColor: 'red', height: '100%', width: '100%' }}>
-              <Text>Red</Text>
-            </View>
-          </Panel>
-          <PanelResizeHandle />
-          <Panel>
-            <View style={{ backgroundColor: 'blue', height: '100%', width: '100%' }}>
-              <Text>Blue</Text>
-            </View>
-          </Panel>
-          <PanelResizeHandle />
-          <Panel defaultSize={25}>
-            <View style={{ backgroundColor: 'green', height: '100%', width: '100%' }}>
-              <Text>Green</Text>
-            </View>
-          </Panel>
-        </PanelGroup>
-      </Panel>
-      <PanelResizeHandle />
-      <Panel defaultSize={25}>
-        <View style={{ backgroundColor: 'yellow', height: '100%', width: '100%' }}>
-          <Text>Yellow</Text>
-        </View>
-      </Panel>
-    </PanelGroup>
+    <FlatList
+      data={links}
+      keyExtractor={(item) => item.href}
+      renderItem={({ item }) => (
+        <Link href={item.href as any} asChild>
+          <Pressable style={styles.item}>
+            <Text style={styles.itemText}>{item.name}</Text>
+            <Text style={styles.chevron}>{'>'}</Text>
+          </Pressable>
+        </Link>
+      )}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      style={styles.container}
+    />
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#121212',
+  },
+  item: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#1e1e1e',
+  },
+  itemText: {
+    fontSize: 16,
+    color: '#ffffff',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#333333',
+  },
+  chevron: {
+    fontSize: 18,
+    color: '#aaaaaa',
+  },
+});

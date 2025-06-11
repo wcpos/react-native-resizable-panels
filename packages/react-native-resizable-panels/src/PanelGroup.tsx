@@ -8,6 +8,10 @@ import React, {
   useState,
 } from 'react';
 import { StyleProp, View, ViewProps, ViewStyle } from 'react-native';
+import type {
+  GestureUpdateEvent,
+  PanGestureHandlerEventPayload,
+} from 'react-native-gesture-handler';
 import { useSharedValue } from 'react-native-reanimated';
 
 import type { PanelConstraints, PanelData } from './Panel';
@@ -112,7 +116,6 @@ export function PanelGroup({
   }, [panelDataArray, layoutShared, panelIdsShared, setLayout]);
 
   const registerPanel = useCallback((panelData: PanelData) => {
-    console.log(`[JS] Registering panel with ID: ${panelData.id}`);
     setPanelDataArray((currentPanelDataArray) => {
       const newArray = [...currentPanelDataArray, panelData];
       newArray.sort((a, b) => {
@@ -123,13 +126,11 @@ export function PanelGroup({
         if (ob == null) return 1;
         return oa - ob;
       });
-      console.log(`[JS] Panel array is now: [${newArray.map((p) => p.id).join(', ')}]`);
       return newArray;
     });
   }, []);
 
   const unregisterPanel = useCallback((panelData: PanelData) => {
-    console.log(`[JS] Unregistering panel with ID: ${panelData.id}`);
     setPanelDataArray((currentPanelDataArray) => {
       const idx = currentPanelDataArray.findIndex((pd) => pd.id === panelData.id);
       if (idx >= 0) {
@@ -347,13 +348,39 @@ export function PanelGroup({
     dragStateSV.value = null;
   }, [dragStateSV]);
 
-  const registerResizeHandle = useCallback(() => {
-    return (translationX: number, translationY: number) => {
-      console.log('translationX', translationX);
-      console.log('translationY', translationY);
-      // …your resize logic here…
-    };
-  }, []);
+  const updateLayout = useCallback(
+    (dragHandleId: string, event: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
+      const { value: dragState } = dragStateSV;
+      if (!dragState || dragState.dragHandleId !== dragHandleId) {
+        return;
+      }
+      const { direction } = committedValuesRef.current;
+      const { initialLayout, pivotIndices, containerSizePx } = dragState;
+      const isHorizontal = direction === 'horizontal';
+      const delta = isHorizontal ? event.translationX : event.translationY;
+
+      if (containerSizePx === 0) {
+        return;
+      }
+
+      const deltaPercentage = (delta / containerSizePx) * 100;
+      const panelConstraints = panelDataArray.map((pd) => pd.constraints);
+
+      const nextLayout = adjustLayoutByDelta({
+        delta: deltaPercentage,
+        initialLayout,
+        panelConstraints,
+        pivotIndices,
+        prevLayout: layoutShared.value,
+        trigger: 'mouse-or-touch',
+      });
+
+      if (!compareLayouts(layoutShared.value, nextLayout)) {
+        setLayout(nextLayout);
+      }
+    },
+    [layoutShared, panelDataArray, setLayout]
+  );
 
   const getPanelIndex = useCallback(
     (panelData: PanelData): number => {
@@ -376,7 +403,7 @@ export function PanelGroup({
       reevaluatePanelConstraints,
       registerPanel,
       registerHandle,
-      registerResizeHandle,
+      updateLayout,
       resizePanel,
       startDragging,
       stopDragging,
@@ -397,7 +424,7 @@ export function PanelGroup({
       reevaluatePanelConstraints,
       registerPanel,
       registerHandle,
-      registerResizeHandle,
+      updateLayout,
       resizePanel,
       startDragging,
       stopDragging,

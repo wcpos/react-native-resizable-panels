@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+import { GestureUpdateEvent, PanGestureHandlerEventPayload } from 'react-native-gesture-handler';
 import { SharedValue } from 'react-native-reanimated';
 import { PanelConstraints, PanelData } from './Panel';
 
@@ -22,13 +23,14 @@ export type TPanelGroupContext = {
   reevaluatePanelConstraints: (panelData: PanelData, prevConstraints: PanelConstraints) => void;
   registerPanel: (panelData: PanelData) => void;
   registerHandle: (handleId: string) => [number, number];
-  registerResizeHandle: () => (translationX: number, translationY: number) => void;
+  // registerResizeHandle: () => (translationX: number, translationY: number) => void;
   resizePanel: (panelData: PanelData, size: number) => void;
   startDragging: (dragHandleId: string) => void;
   stopDragging: () => void;
   unregisterPanel: (panelData: PanelData) => void;
   layoutShared: SharedValue<number[]>;
   panelIdsShared: SharedValue<string[]>;
+  updateLayout: (handleId: string, e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => void;
 };
 
 export const PanelGroupContext = createContext<TPanelGroupContext | null>(null);

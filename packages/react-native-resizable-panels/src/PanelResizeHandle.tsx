@@ -1,6 +1,11 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  GestureUpdateEvent,
+  PanGestureHandlerEventPayload,
+} from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 
 import { PanelGroupContext } from './PanelGroupContext';
@@ -38,7 +43,7 @@ export function PanelResizeHandle({
     throw new Error('<PanelResizeHandle> must be rendered inside a <PanelGroup>');
   }
 
-  const { direction, startDragging, registerResizeHandle, stopDragging, registerHandle } = context;
+  const { direction, startDragging, updateLayout, stopDragging, registerHandle } = context;
 
   // Give each handle a stable unique ID, so the parent can track them separately.
   const handleIdRef = useRef<string>(`resize-handle-${Math.random().toString(36).slice(2)}`);
@@ -59,10 +64,9 @@ export function PanelResizeHandle({
       }
       runOnJS(startDragging)(handleIdRef.current);
     })
-    .onUpdate((e) => {
+    .onUpdate((e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
       if (disabled) return;
-      const resizeHandler = registerResizeHandle(handleIdRef.current);
-      resizeHandler(e);
+      runOnJS(updateLayout)(handleIdRef.current, e);
     })
     .onEnd(() => {
       if (disabled) return;

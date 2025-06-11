@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, test } from "vitest";
-import { getIntersectingRectangle } from "./getIntersectingRectangle";
-import { Rectangle } from "./types";
+import { beforeEach, describe, expect, test } from 'vitest';
+import { getIntersectingRectangle } from './getIntersectingRectangle';
+import { Rectangle } from './types';
 
 const emptyRect = { x: 0, y: 0, width: 0, height: 0 };
 const rect = { x: 25, y: 25, width: 50, height: 50 };
@@ -9,7 +9,7 @@ function forkRect(partial: Partial<Rectangle>, baseRect: Rectangle = rect) {
   return { ...rect, ...partial };
 }
 
-describe("getIntersectingRectangle", () => {
+describe('getIntersectingRectangle', () => {
   let strict: boolean = false;
 
   function verify(rectOne: Rectangle, rectTwo: Rectangle, expected: Rectangle) {
@@ -19,15 +19,15 @@ describe("getIntersectingRectangle", () => {
       expect(actual).toEqual(expected);
     } catch (thrown) {
       console.log(
-        "Expect",
-        strict ? "strict mode" : "loose mode",
-        "\n",
+        'Expect',
+        strict ? 'strict mode' : 'loose mode',
+        '\n',
         rectOne,
-        "\n",
+        '\n',
         rectTwo,
-        "\n\nto intersect as:\n",
+        '\n\nto intersect as:\n',
         expected,
-        "\n\nbut got:\n",
+        '\n\nbut got:\n',
         actual
       );
 
@@ -35,16 +35,16 @@ describe("getIntersectingRectangle", () => {
     }
   }
 
-  describe("loose", () => {
+  describe('loose', () => {
     beforeEach(() => {
       strict = false;
     });
 
-    test("should support empty rects", () => {
+    test('should support empty rects', () => {
       verify(emptyRect, emptyRect, emptyRect);
     });
 
-    test("should support fully overlapping rects", () => {
+    test('should support fully overlapping rects', () => {
       verify(rect, forkRect({ x: 35, width: 30 }), {
         x: 35,
         y: 25,
@@ -77,7 +77,7 @@ describe("getIntersectingRectangle", () => {
       );
     });
 
-    test("should support partially overlapping rects", () => {
+    test('should support partially overlapping rects', () => {
       verify(rect, forkRect({ x: 10, y: 10 }), {
         x: 25,
         y: 25,
@@ -93,11 +93,11 @@ describe("getIntersectingRectangle", () => {
       });
     });
 
-    test("should support non-overlapping rects", () => {
+    test('should support non-overlapping rects', () => {
       verify(rect, forkRect({ x: 100, y: 100 }), emptyRect);
     });
 
-    test("should support all negative coordinates", () => {
+    test('should support all negative coordinates', () => {
       verify(
         {
           x: -100,
@@ -116,16 +116,16 @@ describe("getIntersectingRectangle", () => {
     });
   });
 
-  describe("strict", () => {
+  describe('strict', () => {
     beforeEach(() => {
       strict = true;
     });
 
-    test("should support empty rects", () => {
+    test('should support empty rects', () => {
       verify(emptyRect, emptyRect, emptyRect);
     });
 
-    test("should support fully overlapping rects", () => {
+    test('should support fully overlapping rects', () => {
       verify(rect, forkRect({ x: 35, width: 30 }), {
         x: 35,
         y: 25,
@@ -158,7 +158,7 @@ describe("getIntersectingRectangle", () => {
       );
     });
 
-    test("should support partially overlapping rects", () => {
+    test('should support partially overlapping rects', () => {
       verify(rect, forkRect({ x: 10, y: 10 }), {
         x: 25,
         y: 25,
@@ -174,11 +174,11 @@ describe("getIntersectingRectangle", () => {
       });
     });
 
-    test("should support non-overlapping rects", () => {
+    test('should support non-overlapping rects', () => {
       verify(rect, forkRect({ x: 100, y: 100 }), emptyRect);
     });
 
-    test("should support all negative coordinates", () => {
+    test('should support all negative coordinates', () => {
       verify(
         {
           x: -100,

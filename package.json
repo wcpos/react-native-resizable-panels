@@ -10,6 +10,7 @@
     "build:example": "turbo build --filter=\"...{./apps/example}\""
   },
   "devDependencies": {
+    "@types/react-syntax-highlighter": "^15.5.13",
     "turbo": "^1.13.4",
     "typescript": "^5.8.3"
   },
@@ -18,5 +19,9 @@
     "tabWidth": 2,
     "singleQuote": true,
     "trailingComma": "es5"
+  },
+  "dependencies": {
+    "react-native-code-highlighter": "^1.2.3",
+    "react-syntax-highlighter": "^15.6.1"
   }
 }

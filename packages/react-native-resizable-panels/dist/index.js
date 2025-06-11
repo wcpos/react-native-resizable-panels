@@ -192,9 +192,6 @@ function Panel({
     const panelIds = panelIdsShared.value;
     const currentDragState = dragState.value;
     const panelIndex = panelIds.indexOf(panelId);
-    console.log(
-      `[UI] Style calculation for panelId "${panelId}". Searching in [${panelIds.join(", ")}]. Found index: ${panelIndex}`
-    );
     const size = panelIndex > -1 ? layout[panelIndex] : void 0;
     let flexGrowValue;
     const precision = 3;
@@ -217,36 +214,8 @@ function Panel({
       pointerEvents: currentDragState !== null ? "none" : "auto"
     };
   }, [panelId, defaultSize]);
-  const debugText = (0, import_react_native_reanimated.useDerivedValue)(() => {
-    const layout = layoutShared.value;
-    const panelIds = panelIdsShared.value;
-    const panelIndex = panelIds.indexOf(panelId);
-    const size = panelIndex > -1 ? layout[panelIndex] : "N/A";
-    return `Panel ID: ${panelId.substring(0, 5)}
-Index: ${panelIndex}
-Size: ${typeof size === "number" ? size.toFixed(1) : size}`;
-  });
-  const animatedDebugProps = (0, import_react_native_reanimated.useAnimatedProps)(() => {
-    return {
-      children: debugText.value
-    };
-  });
   return <import_react_native_reanimated.default.View {...viewProps} style={[animatedStyle, styleFromProps]}>
       {children}
-      <import_react_native_reanimated.default.Text
-    style={{
-      position: "absolute",
-      top: 10,
-      left: 10,
-      backgroundColor: "rgba(0,0,0,0.7)",
-      color: "white",
-      padding: 4,
-      fontSize: 10,
-      borderRadius: 4,
-      zIndex: 100
-    }}
-    animatedProps={animatedDebugProps}
-  />
     </import_react_native_reanimated.default.View>;
 }
 
@@ -690,7 +659,6 @@ function PanelGroup({
     panelIdsShared.value = panelDataArray.map((pd) => pd.id);
   }, [panelDataArray, layoutShared, panelIdsShared, setLayout]);
   const registerPanel = (0, import_react4.useCallback)((panelData) => {
-    console.log(`[JS] Registering panel with ID: ${panelData.id}`);
     setPanelDataArray((currentPanelDataArray) => {
       const newArray = [...currentPanelDataArray, panelData];
       newArray.sort((a, b) => {
@@ -700,12 +668,10 @@ function PanelGroup({
         if (ob == null) return 1;
         return oa - ob;
       });
-      console.log(`[JS] Panel array is now: [${newArray.map((p) => p.id).join(", ")}]`);
       return newArray;
     });
   }, []);
   const unregisterPanel = (0, import_react4.useCallback)((panelData) => {
-    console.log(`[JS] Unregistering panel with ID: ${panelData.id}`);
     setPanelDataArray((currentPanelDataArray) => {
       const idx = currentPanelDataArray.findIndex((pd) => pd.id === panelData.id);
       if (idx >= 0) {
@@ -907,12 +873,35 @@ function PanelGroup({
   const stopDragging = (0, import_react4.useCallback)(() => {
     dragStateSV.value = null;
   }, [dragStateSV]);
-  const registerResizeHandle = (0, import_react4.useCallback)(() => {
-    return (translationX, translationY) => {
-      console.log("translationX", translationX);
-      console.log("translationY", translationY);
-    };
-  }, []);
+  const updateLayout = (0, import_react4.useCallback)(
+    (dragHandleId, event) => {
+      const { value: dragState } = dragStateSV;
+      if (!dragState || dragState.dragHandleId !== dragHandleId) {
+        return;
+      }
+      const { direction: direction2 } = committedValuesRef.current;
+      const { initialLayout, pivotIndices, containerSizePx } = dragState;
+      const isHorizontal = direction2 === "horizontal";
+      const delta = isHorizontal ? event.translationX : event.translationY;
+      if (containerSizePx === 0) {
+        return;
+      }
+      const deltaPercentage = delta / containerSizePx * 100;
+      const panelConstraints = panelDataArray.map((pd) => pd.constraints);
+      const nextLayout = adjustLayoutByDelta({
+        delta: deltaPercentage,
+        initialLayout,
+        panelConstraints,
+        pivotIndices,
+        prevLayout: layoutShared.value,
+        trigger: "mouse-or-touch"
+      });
+      if (!compareLayouts(layoutShared.value, nextLayout)) {
+        setLayout(nextLayout);
+      }
+    },
+    [layoutShared, panelDataArray, setLayout]
+  );
   const getPanelIndex = (0, import_react4.useCallback)(
     (panelData) => {
       return panelDataArray.findIndex((pd) => pd.id === panelData.id);
@@ -933,7 +922,7 @@ function PanelGroup({
       reevaluatePanelConstraints,
       registerPanel,
       registerHandle,
-      registerResizeHandle,
+      updateLayout,
       resizePanel: resizePanel2,
       startDragging,
       stopDragging,
@@ -954,7 +943,7 @@ function PanelGroup({
       reevaluatePanelConstraints,
       registerPanel,
       registerHandle,
-      registerResizeHandle,
+      updateLayout,
       resizePanel2,
       startDragging,
       stopDragging,
@@ -1003,7 +992,7 @@ function PanelResizeHandle({
   if (context === null) {
     throw new Error("<PanelResizeHandle> must be rendered inside a <PanelGroup>");
   }
-  const { direction, startDragging, registerResizeHandle, stopDragging, registerHandle } = context;
+  const { direction, startDragging, updateLayout, stopDragging, registerHandle } = context;
   const handleIdRef = (0, import_react5.useRef)(`resize-handle-${Math.random().toString(36).slice(2)}`);
   (0, import_react5.useEffect)(() => {
     registerHandle(handleIdRef.current);
@@ -1016,8 +1005,7 @@ function PanelResizeHandle({
     (0, import_react_native_reanimated3.runOnJS)(startDragging)(handleIdRef.current);
   }).onUpdate((e) => {
     if (disabled) return;
-    const resizeHandler = registerResizeHandle(handleIdRef.current);
-    resizeHandler(e);
+    (0, import_react_native_reanimated3.runOnJS)(updateLayout)(handleIdRef.current, e);
   }).onEnd(() => {
     if (disabled) return;
     if (onDragging) {

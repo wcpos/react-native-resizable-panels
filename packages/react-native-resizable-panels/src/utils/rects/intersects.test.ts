@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, test } from "vitest";
-import { intersects } from "./intersects";
-import { Rectangle } from "./types";
+import { beforeEach, describe, expect, test } from 'vitest';
+import { intersects } from './intersects';
+import { Rectangle } from './types';
 
 const emptyRect = { x: 0, y: 0, width: 0, height: 0 };
 const rect = { x: 25, y: 25, width: 50, height: 50 };
@@ -9,7 +9,7 @@ function forkRect(partial: Partial<Rectangle>, baseRect: Rectangle = rect) {
   return { ...rect, ...partial };
 }
 
-describe("intersects", () => {
+describe('intersects', () => {
   let strict: boolean = false;
 
   function verify(rectOne: Rectangle, rectTwo: Rectangle, expected: boolean) {
@@ -19,28 +19,28 @@ describe("intersects", () => {
       expect(actual).toBe(expected);
     } catch (thrown) {
       console.log(
-        "Expected",
+        'Expected',
         rectOne,
-        "to",
-        expected ? "intersect" : "not intersect",
+        'to',
+        expected ? 'intersect' : 'not intersect',
         rectTwo,
-        strict ? "in strict mode" : "in loose mode"
+        strict ? 'in strict mode' : 'in loose mode'
       );
 
       throw thrown;
     }
   }
 
-  describe("loose", () => {
+  describe('loose', () => {
     beforeEach(() => {
       strict = false;
     });
 
-    test("should handle empty rects", () => {
+    test('should handle empty rects', () => {
       verify(emptyRect, emptyRect, true);
     });
 
-    test("should support fully overlapping rects", () => {
+    test('should support fully overlapping rects', () => {
       verify(rect, rect, true);
 
       verify(rect, forkRect({ x: 35, width: 30 }), true);
@@ -70,7 +70,7 @@ describe("intersects", () => {
       );
     });
 
-    test("should support partially overlapping rects", () => {
+    test('should support partially overlapping rects', () => {
       const cases: Partial<Rectangle>[] = [
         { x: 0 },
         { y: 0 },
@@ -89,7 +89,7 @@ describe("intersects", () => {
       });
     });
 
-    test("should support non-overlapping rects", () => {
+    test('should support non-overlapping rects', () => {
       const cases: Partial<Rectangle>[] = [
         { x: 100 },
         { x: -100 },
@@ -104,7 +104,7 @@ describe("intersects", () => {
       });
     });
 
-    test("should support all negative coordinates", () => {
+    test('should support all negative coordinates', () => {
       expect(
         intersects(
           { x: -100, y: -100, width: 50, height: 50 },
@@ -115,16 +115,16 @@ describe("intersects", () => {
     });
   });
 
-  describe("strict", () => {
+  describe('strict', () => {
     beforeEach(() => {
       strict = true;
     });
 
-    test("should handle empty rects", () => {
+    test('should handle empty rects', () => {
       verify(emptyRect, emptyRect, false);
     });
 
-    test("should support fully overlapping rects", () => {
+    test('should support fully overlapping rects', () => {
       verify(rect, rect, true);
 
       verify(rect, forkRect({ x: 35, width: 30 }), true);
@@ -154,7 +154,7 @@ describe("intersects", () => {
       );
     });
 
-    test("should support partially overlapping rects", () => {
+    test('should support partially overlapping rects', () => {
       const cases: Partial<Rectangle>[] = [{ x: 0 }, { y: 0 }];
 
       cases.forEach((partial) => {
@@ -162,7 +162,7 @@ describe("intersects", () => {
       });
     });
 
-    test("should support non-overlapping rects", () => {
+    test('should support non-overlapping rects', () => {
       const cases: Partial<Rectangle>[] = [
         { x: 100 },
         { x: -100 },
@@ -185,7 +185,7 @@ describe("intersects", () => {
       });
     });
 
-    test("should support all negative coordinates", () => {
+    test('should support all negative coordinates', () => {
       expect(
         intersects(
           { x: -100, y: -100, width: 50, height: 50 },
