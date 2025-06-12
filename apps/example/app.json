@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "react-native-resizable-panels-example",
+    "name": "React Native Resizable Panels Example",
     "slug": "react-native-resizable-panels-example",
+    "owner": "wcpos",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,14 +11,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.kilbot.reactnativeresizablepanelsexample"
+      "bundleIdentifier": "com.wcpos.reactnativeresizablepanelsexample"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.kilbot.reactnativeresizablepanelsexample"
+      "package": "com.wcpos.reactnativeresizablepanelsexample"
     },
     "web": {
       "bundler": "metro",
@@ -40,6 +41,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c7e2b6d0-1a80-4771-b8aa-350e3e643e71"
+      }
     }
   }
 }
