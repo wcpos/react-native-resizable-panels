@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  EXPO_USE_FAST_RESOLVER: true # Use the faster Metro resolver in SDK 51
+  EXPO_USE_FAST_RESOLVER: true
 
 jobs:
   example:
@@ -42,12 +42,22 @@ jobs:
         working-directory: apps/example
         run: pnpm expo export --platform web --output-dir ./build
 
-      - name: 🚀 Deploy apps/example preview
+      - name: 🚀 Deploy web (preview)
         if: ${{ github.event_name == 'pull_request' || github.event.inputs.target == 'preview' }}
         working-directory: apps/example
-        run: eas deploy --export-dir ./build
+        run: eas deploy --export-dir ./build --channel preview --non-interactive
 
-      - name: 🚀 Deploy apps/example production
+      - name: 🚀 Publish to Expo Go (preview)
+        if: ${{ github.event_name == 'pull_request' || github.event.inputs.target == 'preview' }}
+        working-directory: apps/example
+        run: eas update --branch preview --message "CI publish for Expo Go (preview)" --non-interactive
+
+      - name: 🚀 Deploy web (production)
         if: ${{ (github.event_name == 'push' && github.ref_name == 'main') || github.event.inputs.target == 'production' }}
         working-directory: apps/example
-        run: eas deploy --export-dir ./build --production
+        run: eas deploy --export-dir ./build --channel production --non-interactive --production
+
+      - name: 🚀 Publish to Expo Go (production)
+        if: ${{ (github.event_name == 'push' && github.ref_name == 'main') || github.event.inputs.target == 'production' }}
+        working-directory: apps/example
+        run: eas update --branch production --message "CI publish for Expo Go (production)" --non-interactive
