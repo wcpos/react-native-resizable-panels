@@ -28,6 +28,15 @@ You also need to ensure `react-native-reanimated` and `react-native-gesture-hand
 
 You can find a comprehensive example app in the `apps/example` directory of this repository.
 
+## Live Examples
+
+- **[Web apр](https://react-native-resizable-panels-example.expo.app/)**: View the example application running in your browser.
+- **Expo Go**: Open the example app on your device using the [Expo Go app](https://expo.dev/go) by scanning the QR code below.
+
+<p align="center">
+  <img src="https://qr.expo.dev/eas-update?slug=exp&projectId=c7e2b6d0-1a80-4771-b8aa-350e3e643e71&groupId=f9426121-c5fa-474c-8d92-8e297f4f5d62&host=u.expo.dev" width="250" height="250" />
+</p>
+
 ## API
 
 ### `PanelGroup`
