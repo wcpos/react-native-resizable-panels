@@ -11,10 +11,9 @@ on:
         options:
           - preview
           - production
-  push:
-    branches: [main]
+  push: {}
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
@@ -43,21 +42,21 @@ jobs:
         run: pnpm expo export --platform web --output-dir ./build
 
       - name: 🚀 Deploy web (preview)
-        if: ${{ github.event_name == 'pull_request' || github.event.inputs.target == 'preview' }}
+        if: ${{ github.event_name == 'pull_request' || github.event.inputs.target == 'preview' || github.ref != 'refs/heads/main' }}
         working-directory: apps/example
-        run: eas deploy --export-dir ./build --channel preview --non-interactive
+        run: eas deploy --export-dir ./build --non-interactive
 
       - name: 🚀 Publish to Expo Go (preview)
-        if: ${{ github.event_name == 'pull_request' || github.event.inputs.target == 'preview' }}
+        if: ${{ github.event_name == 'pull_request' || github.event.inputs.target == 'preview' || github.ref != 'refs/heads/main' }}
         working-directory: apps/example
         run: eas update --branch preview --message "CI publish for Expo Go (preview)" --non-interactive
 
       - name: 🚀 Deploy web (production)
-        if: ${{ (github.event_name == 'push' && github.ref_name == 'main') || github.event.inputs.target == 'production' }}
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event.inputs.target == 'production' }}
         working-directory: apps/example
-        run: eas deploy --export-dir ./build --channel production --non-interactive --production
+        run: eas deploy --export-dir ./build --non-interactive --production
 
       - name: 🚀 Publish to Expo Go (production)
-        if: ${{ (github.event_name == 'push' && github.ref_name == 'main') || github.event.inputs.target == 'production' }}
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event.inputs.target == 'production' }}
         working-directory: apps/example
         run: eas update --branch production --message "CI publish for Expo Go (production)" --non-interactive
