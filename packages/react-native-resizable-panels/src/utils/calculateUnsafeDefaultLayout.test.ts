@@ -1,9 +1,9 @@
-import { beforeEach, describe, test } from "vitest";
-import { PanelConstraints, PanelData } from "../Panel";
-import { calculateUnsafeDefaultLayout } from "./calculateUnsafeDefaultLayout";
-import { expectToBeCloseToArray } from "./test-utils";
+import { beforeEach, describe, test } from 'vitest';
+import { PanelConstraints, PanelData } from '../Panel';
+import { calculateUnsafeDefaultLayout } from './calculateUnsafeDefaultLayout';
+import { expectToBeCloseToArray } from './test-utils';
 
-describe("calculateUnsafeDefaultLayout", () => {
+describe('calculateUnsafeDefaultLayout', () => {
   let idCounter = 0;
   let orderCounter = 0;
 
@@ -26,7 +26,7 @@ describe("calculateUnsafeDefaultLayout", () => {
     orderCounter = 0;
   });
 
-  test("should assign even sizes for every panel by default", () => {
+  test('should assign even sizes for every panel by default', () => {
     expectToBeCloseToArray(
       calculateUnsafeDefaultLayout({
         panelDataArray: [createPanelData()],
@@ -43,17 +43,13 @@ describe("calculateUnsafeDefaultLayout", () => {
 
     expectToBeCloseToArray(
       calculateUnsafeDefaultLayout({
-        panelDataArray: [
-          createPanelData(),
-          createPanelData(),
-          createPanelData(),
-        ],
+        panelDataArray: [createPanelData(), createPanelData(), createPanelData()],
       }),
       [33.3, 33.3, 33.3]
     );
   });
 
-  test("should respect default panel size constraints", () => {
+  test('should respect default panel size constraints', () => {
     expectToBeCloseToArray(
       calculateUnsafeDefaultLayout({
         panelDataArray: [
@@ -69,7 +65,7 @@ describe("calculateUnsafeDefaultLayout", () => {
     );
   });
 
-  test("should ignore min and max panel size constraints", () => {
+  test('should ignore min and max panel size constraints', () => {
     expectToBeCloseToArray(
       calculateUnsafeDefaultLayout({
         panelDataArray: [

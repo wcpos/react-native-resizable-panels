@@ -1,13 +1,13 @@
-import { describe, expect, test } from "vitest";
-import { PanelConstraints, PanelData } from "../Panel";
-import { computePanelFlexBoxStyle } from "./computePanelFlexBoxStyle";
+import { describe, expect, test } from 'vitest';
+import { PanelConstraints, PanelData } from '../Panel';
+import { computePanelFlexBoxStyle } from './computePanelFlexBoxStyle';
 
-describe("computePanelFlexBoxStyle", () => {
+describe('computePanelFlexBoxStyle', () => {
   function createPanelData(constraints: PanelConstraints = {}): PanelData {
     return {
       callbacks: {},
       constraints,
-      id: "fake",
+      id: 'fake',
       idIsFromProps: false,
       order: undefined,
     };
@@ -39,7 +39,7 @@ describe("computePanelFlexBoxStyle", () => {
 `);
   });
 
-  test("should always fill the full width for single-panel groups", () => {
+  test('should always fill the full width for single-panel groups', () => {
     expect(
       computePanelFlexBoxStyle({
         defaultSize: undefined,
@@ -60,7 +60,7 @@ describe("computePanelFlexBoxStyle", () => {
 `);
   });
 
-  test("should round sizes to avoid floating point precision errors", () => {
+  test('should round sizes to avoid floating point precision errors', () => {
     const layout = [0.25435, 0.5758, 0.1698];
     const panelData = [createPanelData(), createPanelData(), createPanelData()];
 

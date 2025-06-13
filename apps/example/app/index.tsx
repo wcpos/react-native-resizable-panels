@@ -1,7 +1,7 @@
 import { Link } from 'expo-router';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
-const links = [
+export const links = [
   { href: '/horizontal-layouts', name: 'Horizontal layouts' },
   { href: '/vertical-layouts', name: 'Vertical layouts' },
   { href: '/nested-groups', name: 'Nested groups' },
