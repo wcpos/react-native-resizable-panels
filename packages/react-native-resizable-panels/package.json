@@ -1,6 +1,6 @@
 {
   "name": "react-native-resizable-panels",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Resizable panels for React Native",
   "license": "MIT",
   "main": "dist/index.js",
