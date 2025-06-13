@@ -3,6 +3,10 @@
   "version": "0.0.2",
   "description": "Resizable panels for React Native",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wcpos/react-native-resizable-panels.git"
+  },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
