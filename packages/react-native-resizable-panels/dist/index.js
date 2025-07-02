@@ -998,15 +998,18 @@ function PanelResizeHandle({
     registerHandle(handleIdRef.current);
   }, [registerHandle]);
   const panGesture = import_react_native_gesture_handler.Gesture.Pan().onBegin(() => {
+    "worklet";
     if (disabled) return;
     if (onDragging) {
       (0, import_react_native_reanimated3.runOnJS)(onDragging)(true);
     }
     (0, import_react_native_reanimated3.runOnJS)(startDragging)(handleIdRef.current);
   }).onUpdate((e) => {
+    "worklet";
     if (disabled) return;
     (0, import_react_native_reanimated3.runOnJS)(updateLayout)(handleIdRef.current, e);
   }).onEnd(() => {
+    "worklet";
     if (disabled) return;
     if (onDragging) {
       (0, import_react_native_reanimated3.runOnJS)(onDragging)(false);

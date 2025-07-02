@@ -958,15 +958,18 @@ function PanelResizeHandle({
     registerHandle(handleIdRef.current);
   }, [registerHandle]);
   const panGesture = Gesture.Pan().onBegin(() => {
+    "worklet";
     if (disabled) return;
     if (onDragging) {
       runOnJS(onDragging)(true);
     }
     runOnJS(startDragging)(handleIdRef.current);
   }).onUpdate((e) => {
+    "worklet";
     if (disabled) return;
     runOnJS(updateLayout)(handleIdRef.current, e);
   }).onEnd(() => {
+    "worklet";
     if (disabled) return;
     if (onDragging) {
       runOnJS(onDragging)(false);

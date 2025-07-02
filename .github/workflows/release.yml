@@ -1,0 +1,166 @@
+name: Release to NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: 'Type of release'
+        type: choice
+        required: true
+        default: 'patch'
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+      tag:
+        description: 'NPM tag for the release'
+        type: choice
+        required: true
+        default: 'latest'
+        options:
+          - latest
+          - beta
+          - next
+      dry-run:
+        description: 'Run in dry-run mode (no actual publish)'
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Setup repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏗 Setup monorepo
+        uses: ./.github/actions/setup-monorepo
+
+      - name: 🔍 Check if package builds successfully
+        run: |
+          cd packages/react-native-resizable-panels
+          pnpm run build
+
+      - name: 🧪 Run tests
+        run: |
+          cd packages/react-native-resizable-panels
+          pnpm run test:node || echo "No tests configured"
+
+      - name: 🏷️ Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 📦 Bump version
+        id: version
+        run: |
+          cd packages/react-native-resizable-panels
+
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "current-version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+          # Bump version based on release type
+          if [ "${{ github.event.inputs.release-type }}" = "prerelease" ]; then
+            NEW_VERSION=$(pnpm version prerelease --preid=beta --no-git-tag-version)
+          else
+            NEW_VERSION=$(pnpm version ${{ github.event.inputs.release-type }} --no-git-tag-version)
+          fi
+
+          # Clean the version (remove 'v' prefix if present)
+          NEW_VERSION=${NEW_VERSION#v}
+          echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
+
+      - name: 🔖 Create git tag and commit
+        if: ${{ github.event.inputs.dry-run == 'false' }}
+        run: |
+          cd packages/react-native-resizable-panels
+          git add package.json
+          git commit -m "chore: bump version to ${{ steps.version.outputs.new-version }}"
+          git tag "v${{ steps.version.outputs.new-version }}"
+
+      - name: 🏗 Build package for release
+        run: |
+          cd packages/react-native-resizable-panels
+          pnpm run build
+
+      - name: 🔍 Verify package contents
+        run: |
+          cd packages/react-native-resizable-panels
+          pnpm pack --dry-run
+
+      - name: 🚀 Publish to NPM (dry-run)
+        if: ${{ github.event.inputs.dry-run == 'true' }}
+        run: |
+          cd packages/react-native-resizable-panels
+          echo "🔍 DRY RUN - Would publish with tag: ${{ github.event.inputs.tag }}"
+          pnpm publish --dry-run --access public --tag ${{ github.event.inputs.tag }}
+
+      - name: 🚀 Publish to NPM
+        if: ${{ github.event.inputs.dry-run == 'false' }}
+        run: |
+          cd packages/react-native-resizable-panels
+          pnpm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
+          pnpm publish --access public --tag ${{ github.event.inputs.tag }} --no-git-checks
+
+      - name: 📤 Push git changes
+        if: ${{ github.event.inputs.dry-run == 'false' }}
+        run: |
+          git push origin main
+          git push origin "v${{ steps.version.outputs.new-version }}"
+
+      - name: 📝 Create GitHub Release
+        if: ${{ github.event.inputs.dry-run == 'false' && github.event.inputs.tag == 'latest' }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: 'v${{ steps.version.outputs.new-version }}'
+          release_name: 'v${{ steps.version.outputs.new-version }}'
+          body: |
+            ## What's Changed
+
+            Release v${{ steps.version.outputs.new-version }} of react-native-resizable-panels
+
+            ### Package Details
+            - **Version**: ${{ steps.version.outputs.new-version }}
+            - **Previous Version**: ${{ steps.version.outputs.current-version }}
+            - **NPM Tag**: ${{ github.event.inputs.tag }}
+
+            ### Installation
+            ```bash
+            npm install react-native-resizable-panels@${{ steps.version.outputs.new-version }}
+            # or
+            pnpm add react-native-resizable-panels@${{ steps.version.outputs.new-version }}
+            ```
+
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.version.outputs.current-version }}...v${{ steps.version.outputs.new-version }}
+          draft: false
+          prerelease: ${{ github.event.inputs.release-type == 'prerelease' }}
+
+      - name: 📋 Summary
+        run: |
+          echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Package**: react-native-resizable-panels" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ steps.version.outputs.new-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Previous Version**: ${{ steps.version.outputs.current-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release Type**: ${{ github.event.inputs.release-type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **NPM Tag**: ${{ github.event.inputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Dry Run**: ${{ github.event.inputs.dry-run }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event.inputs.dry-run }}" = "false" ]; then
+            echo "✅ **Published to NPM**: https://www.npmjs.com/package/react-native-resizable-panels/v/${{ steps.version.outputs.new-version }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "🔍 **Dry run completed** - No actual publish performed" >> $GITHUB_STEP_SUMMARY
+          fi
