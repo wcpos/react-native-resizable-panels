@@ -104,7 +104,7 @@ jobs:
         run: |
           cd packages/react-native-resizable-panels
           echo "🔍 DRY RUN - Would publish with tag: ${{ github.event.inputs.tag }}"
-          pnpm publish --dry-run --access public --tag ${{ github.event.inputs.tag }}
+          pnpm publish --dry-run --access public --tag ${{ github.event.inputs.tag }} --no-git-checks
 
       - name: 🚀 Publish to NPM
         if: ${{ github.event.inputs.dry-run == 'false' }}
