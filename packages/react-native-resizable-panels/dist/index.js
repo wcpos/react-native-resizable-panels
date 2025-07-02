@@ -1016,7 +1016,7 @@ function PanelResizeHandle({
     }
     (0, import_react_native_reanimated3.runOnJS)(stopDragging)();
   });
-  const defaultHandleStyle = direction === "horizontal" ? { width: 10, alignSelf: "stretch" } : { height: 10, alignSelf: "stretch" };
+  const defaultHandleStyle = direction === "horizontal" ? { width: 0, alignSelf: "stretch" } : { height: 0, alignSelf: "stretch" };
   return <import_react_native_gesture_handler.GestureDetector gesture={panGesture}>
       <import_react_native2.View style={[defaultHandleStyle, style]} {...viewProps} />
     </import_react_native_gesture_handler.GestureDetector>;

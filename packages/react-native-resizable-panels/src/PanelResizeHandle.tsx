@@ -87,8 +87,8 @@ export function PanelResizeHandle({
    */
   const defaultHandleStyle: ViewStyle =
     direction === 'horizontal'
-      ? { width: 10, alignSelf: 'stretch' }
-      : { height: 10, alignSelf: 'stretch' };
+      ? { width: 0, alignSelf: 'stretch' }
+      : { height: 0, alignSelf: 'stretch' };
 
   return (
     <GestureDetector gesture={panGesture}>

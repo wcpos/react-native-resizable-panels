@@ -1,8 +1,10 @@
+import { ScrollView, useWindowDimensions } from 'react-native';
+import { Panel, PanelGroup } from 'react-native-resizable-panels';
+
 import { Code } from '@/components/Code';
 import { ExamplePage } from '@/components/ExamplePage';
+import { ResizeHandle } from '@/components/ResizeHandle';
 import { styles } from '@/styles/common';
-import { ScrollView, useWindowDimensions } from 'react-native';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-native-resizable-panels';
 
 const description =
   'Panels clip their content by default, to avoid showing scrollbars while resizing. Content can still be configured to overflow within a panel though. This example shows how.';
@@ -13,7 +15,7 @@ const code = `<PanelGroup direction="horizontal">
       {/* Content */}
     </ScrollView>
   </Panel>
-  <PanelResizeHandle />
+  <ResizeHandle />
   <Panel>
     <ScrollView>
       {/* Content */}
@@ -35,7 +37,7 @@ export default function OverflowContentScreen() {
             </Code>
           </ScrollView>
         </Panel>
-        <PanelResizeHandle style={styles.ResizeHandle} />
+        <ResizeHandle />
         <Panel style={styles.PanelColumn} defaultSize={50} minSize={25}>
           <ScrollView>
             <Code language="javascript" showLineNumbers>

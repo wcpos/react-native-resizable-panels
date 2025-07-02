@@ -1,15 +1,11 @@
-import { Button } from '@/components/Button';
-import { ExamplePage } from '@/components/ExamplePage';
-import { colors, styles } from '@/styles/common';
 import { useRef, useState } from 'react';
 import { Text, View } from 'react-native';
+import { ImperativePanelHandle, Panel, PanelGroup } from 'react-native-resizable-panels';
 
-import {
-  ImperativePanelHandle,
-  Panel,
-  PanelGroup,
-  PanelResizeHandle,
-} from 'react-native-resizable-panels';
+import { Button } from '@/components/Button';
+import { ExamplePage } from '@/components/ExamplePage';
+import { ResizeHandle } from '@/components/ResizeHandle';
+import { colors, styles } from '@/styles/common';
 
 type Sizes = {
   left: number;
@@ -91,7 +87,7 @@ const code = `import {
    <Panel collapsible ref={ref}>
      <Text>left</Text>
    </Panel>
-   <PanelResizeHandle />
+   <ResizeHandle />
    <Panel>
      <Text>right</Text>
    </Panel>
@@ -143,7 +139,7 @@ export default function ImperativePanelApiScreen() {
             left: {Math.round(sizes.left)}
           </Text>
         </Panel>
-        <PanelResizeHandle style={styles.ResizeHandle} />
+        <ResizeHandle />
         <Panel
           style={styles.PanelRow}
           collapsible={true}
@@ -158,7 +154,7 @@ export default function ImperativePanelApiScreen() {
             middle: {Math.round(sizes.middle)}
           </Text>
         </Panel>
-        <PanelResizeHandle style={styles.ResizeHandle} />
+        <ResizeHandle />
         <Panel
           style={styles.PanelRow}
           collapsible

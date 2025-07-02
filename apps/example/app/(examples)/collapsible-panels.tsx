@@ -1,3 +1,7 @@
+import { useReducer } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { Panel, PanelGroup, assert } from 'react-native-resizable-panels';
+
 import {
   TUTORIAL_CODE_CSS,
   TUTORIAL_CODE_HTML,
@@ -7,10 +11,8 @@ import {
 import { Code } from '@/components/Code';
 import { ExamplePage } from '@/components/ExamplePage';
 import { Icon } from '@/components/Icon';
+import { ResizeHandle } from '@/components/ResizeHandle';
 import { colors, styles } from '@/styles/common';
-import { useReducer } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import { Panel, PanelGroup, PanelResizeHandle, assert } from 'react-native-resizable-panels';
 
 function Description() {
   return (
@@ -25,7 +27,7 @@ const code = `<PanelGroup direction="horizontal">
   <Panel collapsible={true} collapsedSize={35} minSize={10}>
     <SourceBrowser />
   </Panel>
-  <PanelResizeHandle />
+  <ResizeHandle />
   <Panel>
     <SourceViewer />
   </Panel>
@@ -38,7 +40,7 @@ type File = {
   path: string[];
 };
 
-const FILE_PATHS: Array<[path: string, code: string]> = [
+const FILE_PATHS: [path: string, code: string][] = [
   ['source/index.html', TUTORIAL_CODE_HTML],
   ['source/README.md', TUTORIAL_CODE_README],
   ['source/styles.css', TUTORIAL_CODE_CSS],
@@ -84,7 +86,7 @@ function reducer(state: FilesState, action: FilesAction): FilesState {
       const { file } = action;
       const { currentFileIndex, openFiles } = state;
 
-      let fileIndex = openFiles.findIndex(({ fileName }) => fileName === file.fileName);
+      const fileIndex = openFiles.findIndex(({ fileName }) => fileName === file.fileName);
       if (fileIndex === -1) {
         // File not open; this shouldn't happen.
         return state;
@@ -188,9 +190,7 @@ export default function CollapsiblePanelsScreen() {
             ))}
           </View>
         </Panel>
-        <PanelResizeHandle
-          style={fileListCollapsed ? styles.ResizeHandleCollapsed : styles.ResizeHandle}
-        />
+        <ResizeHandle />
         <Panel style={styles.PanelColumn} minSize={50}>
           {currentFile && (
             <Code code={currentFile.code.trim()} language={currentFile.language} showLineNumbers />

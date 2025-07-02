@@ -1,10 +1,12 @@
-import { Button } from '@/components/Button';
-import { ExamplePage } from '@/components/ExamplePage';
-import { colors, styles } from '@/styles/common';
 import { useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import type { ImperativePanelGroupHandle } from 'react-native-resizable-panels';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-native-resizable-panels';
+import { Panel, PanelGroup } from 'react-native-resizable-panels';
+
+import { Button } from '@/components/Button';
+import { ExamplePage } from '@/components/ExamplePage';
+import { ResizeHandle } from '@/components/ResizeHandle';
+import { colors, styles } from '@/styles/common';
 
 function Description() {
   const apiMethods = [
@@ -44,8 +46,7 @@ const code = `import {
    ImperativePanelGroupHandle,
    Panel,
    PanelGroup,
-   PanelResizeHandle,
- } from "react-resizable-panels";
+} from "react-native-resizable-panels";
  
  const ref = useRef<ImperativePanelGroupHandle>(null);
  
@@ -59,7 +60,7 @@ const code = `import {
  
  <PanelGroup direction="horizontal" ref={ref}>
    <Panel>left</Panel>
-   <PanelResizeHandle />
+   <ResizeHandle />
    <Panel>right</Panel>
  </PanelGroup>`;
 
@@ -99,7 +100,7 @@ export default function ImperativePanelGroupApiScreen() {
             left: {left ? Math.round(left) : '-'}
           </Text>
         </Panel>
-        <PanelResizeHandle style={styles.ResizeHandle} />
+        <ResizeHandle />
         <Panel style={styles.PanelRow} minSize={10}>
           <Text style={{ ...styles.Centered, color: colors.default }}>
             right: {right ? Math.round(right) : '-'}

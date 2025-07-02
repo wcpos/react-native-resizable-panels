@@ -976,7 +976,7 @@ function PanelResizeHandle({
     }
     runOnJS(stopDragging)();
   });
-  const defaultHandleStyle = direction === "horizontal" ? { width: 10, alignSelf: "stretch" } : { height: 10, alignSelf: "stretch" };
+  const defaultHandleStyle = direction === "horizontal" ? { width: 0, alignSelf: "stretch" } : { height: 0, alignSelf: "stretch" };
   return <GestureDetector gesture={panGesture}>
       <View2 style={[defaultHandleStyle, style]} {...viewProps} />
     </GestureDetector>;

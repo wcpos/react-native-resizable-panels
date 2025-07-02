@@ -1,7 +1,9 @@
-import { ExamplePage } from '@/components/ExamplePage';
-import { colors, styles } from '@/styles/common';
 import { Text } from 'react-native';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-native-resizable-panels';
+import { Panel, PanelGroup } from 'react-native-resizable-panels';
+
+import { ExamplePage } from '@/components/ExamplePage';
+import { ResizeHandle } from '@/components/ResizeHandle';
+import { colors, styles } from '@/styles/common';
 
 const description =
   'Layouts are automatically saved when an `autoSaveId` prop is provided. Try this by editing the layout below and then reloading the page.';
@@ -10,7 +12,7 @@ const code = `<PanelGroup autoSaveId="persistence" direction="horizontal">
   <Panel>
     <Text>left</Text>
   </Panel>
-  <PanelResizeHandle />
+  <ResizeHandle />
   <Panel>
     <Text>right</Text>
   </Panel>
@@ -23,11 +25,11 @@ export default function PersistentLayoutsScreen() {
         <Panel style={styles.PanelColumn} minSize={10}>
           <Text style={{ ...styles.Centered, color: colors.default }}>left</Text>
         </Panel>
-        <PanelResizeHandle style={styles.ResizeHandle} />
+        <ResizeHandle />
         <Panel style={styles.PanelRow} minSize={10}>
           <Text style={{ ...styles.Centered, color: colors.default }}>middle</Text>
         </Panel>
-        <PanelResizeHandle style={styles.ResizeHandle} />
+        <ResizeHandle />
         <Panel style={styles.PanelColumn} minSize={10}>
           <Text style={{ ...styles.Centered, color: colors.default }}>right</Text>
         </Panel>

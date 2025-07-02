@@ -1,5 +1,6 @@
 import { Slot, Stack, usePathname } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
+
 import { links } from '../index';
 
 export default function ExampleLayout() {

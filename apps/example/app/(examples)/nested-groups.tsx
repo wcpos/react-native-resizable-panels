@@ -1,7 +1,9 @@
-import { ExamplePage } from '@/components/ExamplePage';
-import { colors, styles } from '@/styles/common';
 import { Text } from 'react-native';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-native-resizable-panels';
+import { Panel, PanelGroup } from 'react-native-resizable-panels';
+
+import { ExamplePage } from '@/components/ExamplePage';
+import { ResizeHandle } from '@/components/ResizeHandle';
+import { colors, styles } from '@/styles/common';
 
 const description =
   'This example shows nested groups. Click near the intersection of two groups to resize in multiple directions at once.';
@@ -10,19 +12,19 @@ const code = `<PanelGroup direction="horizontal">
   <Panel>
     left
   </Panel>
-  <PanelResizeHandle />
+  <ResizeHandle />
   <Panel>
     <PanelGroup direction="vertical">
       <Panel>
         top
       </Panel>
-      <PanelResizeHandle />
+      <ResizeHandle />
       <Panel>
         <PanelGroup direction="horizontal">
           <Panel>
             left
           </Panel>
-          <PanelResizeHandle />
+          <ResizeHandle />
           <Panel>
             right
           </Panel>
@@ -30,7 +32,7 @@ const code = `<PanelGroup direction="horizontal">
       </Panel>
     </PanelGroup>
   </Panel>
-  <PanelResizeHandle />
+  <ResizeHandle />
   <Panel>
     right
   </Panel>
@@ -43,19 +45,19 @@ export default function NestedGroupsScreen() {
         <Panel style={styles.PanelRow} defaultSize={20} minSize={10}>
           <Text style={{ ...styles.Centered, color: colors.default }}>left</Text>
         </Panel>
-        <PanelResizeHandle style={styles.ResizeHandle} />
+        <ResizeHandle />
         <Panel style={styles.PanelRow} minSize={35}>
           <PanelGroup style={styles.PanelGroup} direction="vertical">
             <Panel style={styles.PanelColumn} defaultSize={35} minSize={10}>
               <Text style={{ ...styles.Centered, color: colors.default }}>top</Text>
             </Panel>
-            <PanelResizeHandle style={styles.ResizeHandle} />
+            <ResizeHandle />
             <Panel style={styles.PanelColumn} minSize={10}>
               <PanelGroup style={styles.PanelGroup} direction="horizontal">
                 <Panel style={styles.PanelRow} minSize={10}>
                   <Text style={{ ...styles.Centered, color: colors.default }}>left</Text>
                 </Panel>
-                <PanelResizeHandle style={styles.ResizeHandle} />
+                <ResizeHandle />
                 <Panel style={styles.PanelRow} minSize={10}>
                   <Text style={{ ...styles.Centered, color: colors.default }}>right</Text>
                 </Panel>
@@ -63,7 +65,7 @@ export default function NestedGroupsScreen() {
             </Panel>
           </PanelGroup>
         </Panel>
-        <PanelResizeHandle style={styles.ResizeHandle} />
+        <ResizeHandle />
         <Panel style={styles.PanelRow} defaultSize={20} minSize={10}>
           <Text style={{ ...styles.Centered, color: colors.default }}>right</Text>
         </Panel>

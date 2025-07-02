@@ -1,9 +1,11 @@
-import { Button } from '@/components/Button';
-import { ExamplePage } from '@/components/ExamplePage';
-import { colors, styles } from '@/styles/common';
 import React, { useState } from 'react';
 import { Text } from 'react-native';
-import { Panel, PanelGroup, PanelResizeHandle } from 'react-native-resizable-panels';
+import { Panel, PanelGroup } from 'react-native-resizable-panels';
+
+import { Button } from '@/components/Button';
+import { ExamplePage } from '@/components/ExamplePage';
+import { ResizeHandle } from '@/components/ResizeHandle';
+import { colors, styles } from '@/styles/common';
 
 const description =
   'Panels can be conditionally rendered. The `order` ensures they are (re)added in the correct order.';
@@ -14,7 +16,7 @@ const code = `<PanelGroup autoSaveId="conditional" direction="horizontal">
       <Panel id="left" minSize={10} order={1}>
         <View>left</View>
       </Panel>
-      <PanelResizeHandle />
+      <ResizeHandle />
     </>
   )}
   <Panel id="center" minSize={10} order={2}>
@@ -22,7 +24,7 @@ const code = `<PanelGroup autoSaveId="conditional" direction="horizontal">
   </Panel>
   {showRightPanel && (
     <>
-      <PanelResizeHandle />
+      <ResizeHandle />
       <Panel id="right" minSize={10} order={3}>
         <View>right</View>
       </Panel>
@@ -44,7 +46,7 @@ export default function ConditionalPanelsScreen() {
             <Panel style={styles.Panel} id="left" minSize={10} order={1}>
               <Text style={{ ...styles.Centered, color: colors.default }}>left</Text>
             </Panel>
-            <PanelResizeHandle style={styles.ResizeHandle} />
+            <ResizeHandle />
           </>
         )}
         <Panel style={styles.Panel} id="center" minSize={10} order={2}>
@@ -52,7 +54,7 @@ export default function ConditionalPanelsScreen() {
         </Panel>
         {showRightPanel && (
           <>
-            <PanelResizeHandle style={styles.ResizeHandle} />
+            <ResizeHandle />
             <Panel style={styles.Panel} id="right" minSize={10} order={3}>
               <Text style={{ ...styles.Centered, color: colors.default }}>right</Text>
             </Panel>
