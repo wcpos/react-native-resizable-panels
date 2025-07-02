@@ -97,7 +97,7 @@ jobs:
       - name: 🔍 Verify package contents
         run: |
           cd packages/react-native-resizable-panels
-          pnpm pack --dry-run
+          pnpm pack
 
       - name: 🚀 Publish to NPM (dry-run)
         if: ${{ github.event.inputs.dry-run == 'true' }}
