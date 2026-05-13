@@ -3,6 +3,7 @@ packages:
   - 'packages/*'
 minimumReleaseAge: 1440
 minimumReleaseAgeIgnoreMissingTime: true
+minimumReleaseAgeStrict: false
 blockExoticSubdeps: true
 allowBuilds:
   esbuild: true
