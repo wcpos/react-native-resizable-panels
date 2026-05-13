@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
   pull-requests: write
 
 concurrency:
@@ -35,3 +36,4 @@ jobs:
         with:
           working-directory: apps/example
           command: eas update --auto --branch=pr-${{ github.event.number }}
+          comment: false
