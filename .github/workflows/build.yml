@@ -25,6 +25,9 @@ on:
         type: boolean
         required: false
 
+permissions:
+  contents: read
+
 jobs:
   example:
     runs-on: ubuntu-latest
